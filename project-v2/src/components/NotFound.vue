@@ -50,7 +50,7 @@ export default {
     cursor: pointer;
 }
 
-@media only screen and(max-width:666px) {
+@media only screen and (max-width:666px) {
     .notfound .wrapper {
         left: auto;
         right: 0;
