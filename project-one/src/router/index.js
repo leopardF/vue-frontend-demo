@@ -10,6 +10,7 @@ export default new Router({
         {
             path: '/',
             redirect: '/login',
+            name: '首页',
             hidden: true,
             component: resolve => require(['@/components/Login'], resolve) //异步
         },
@@ -109,7 +110,7 @@ export default new Router({
             children:[
                 {
                     path: '/users/user',
-                    name: '用户列表',
+                    name: '权限管理',
                     iconClass: 'fa fa-user',
                     component: () => import('@/components/users/User')
                 },

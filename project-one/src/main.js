@@ -13,6 +13,16 @@ Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 
+//路由导航守卫
+router.beforeEach((to,from, next) => {
+  if(!localStorage.getItem("token")){
+    if(to.path !== '/login'){
+      next('/login')
+    } else next()
+  } 
+  next()
+})
+
 new Vue({
   router,
   render: h => h(App),
