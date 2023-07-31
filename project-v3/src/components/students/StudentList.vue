@@ -28,23 +28,35 @@
             </el-table-column>
             <el-table-column prop="phone" label="联系号码" align="center" width="150">
             </el-table-column>
-            <el-table-column label="操作" align="center" width="100">
-                <!-- <template #default="scope">
+            <el-table-column label="操作" align="center">
+                <template #default="scope">
+                    <el-button type="danger" size="mini" :icon="Delete" @click="removeData(scope.row)"></el-button>
+                </template>
+                <!-- <template slot-scope="scope">
                     <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeData(scope.row)"></el-button>
                 </template> -->
-                <template slot-scope="scope">
-                    <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeData(scope.row)"></el-button>
-                </template>
             </el-table-column>
         </el-table>
+
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
     </div>
 </template>
+<script setup>
+import {
+  Check,
+  Delete,
+  Edit,
+  Message,
+  Search,
+  Star,
+} from '@element-plus/icons-vue'
+</script>
 <script>
 import { getStudentList, removeStudent } from '@/api/api.js'
+
 export default {
     data() {
         return {
@@ -106,9 +118,6 @@ export default {
             return row.state === 1 ? '已入学' :
             row.state === 2 ? '未入学' : '休学中';
         }
-    },
-    computed: {
-
     }
 }
 </script>

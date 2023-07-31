@@ -5,7 +5,12 @@ import 'element-plus/dist/index.css'
 import locale from 'element-plus/es/locale/lang/zh-cn'
 import axios from 'axios'
 import router from './router'
+import 'font-awesome/css/font-awesome.min.css';
+import service from './service'
+import * as echarts from 'echarts';
 
 const app = createApp(App)
 app.config.globalProperties.$https = axios
-app.use(router).use(ElementPlus, {locale}).mount('#app')
+app.config.globalProperties.service = service
+app.config.globalProperties.$echarts = echarts
+app.use(ElementPlus, {locale}).use(router).mount('#app')
