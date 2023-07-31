@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory}  from 'vue-router'
-// import Home from '../components/Home'
-// import Login from '../components/Login'
 
 const routes = [
     {
@@ -12,13 +10,13 @@ const routes = [
         name: 'Login',
         path: '/login',
         hidden: true,
-        component: resolve => require(['@/components/Login'], resolve) //异步
+        component: () => import('@/components/Login')
     },
     {
         name: 'NotFound',
         path: '/:catchAll(.*)',
         hidden: true,
-        component: resolve => require(['@/components/NotFound'], resolve) //异步
+        component: () => import('@/components/NotFound')
     },
     {
         name: '学生管理',
@@ -111,5 +109,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
 
 export default router
