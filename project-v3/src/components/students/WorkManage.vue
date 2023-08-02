@@ -14,15 +14,25 @@
         <Pageing :tableData="tableData" :total="total" :url="getTableDataUrl" :loading="loading"/>
     </div>
 </template>
-<script setup>
+<script>
 import Pageing from '../common/Pageing.vue'
-import { reactive, ref } from 'vue'
-const tableData = ref([]);
-const total = ref(0);
-const getTableDataUrl = '/v1/homework/getHomeworkList';
-const loading = ref(true)
-const completedText = (row, cloumn) => {
-    return row.completed ? '是' : '否';
+export default {
+    data() {
+        return {
+            tableData: [],
+            total: 0,
+            getTableDataUrl: '/v1/homework/getHomeworkList',
+            loading: true
+        }
+    },
+    methods: {
+        completedText(row, cloumn) {
+            return row.completed ? '是' : '否';
+        }
+    },
+    components: {
+        Pageing
+    }
 }
 </script>
 

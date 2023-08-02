@@ -110,10 +110,22 @@ const routes = [
         component: ()=> import('@/components/Home'), //懒加载
         children:[
             {
-                path: '/users/user',
+                path: '/users/userList',
+                name: '用户管理',
+                iconClass: 'fa fa-user',
+                component: () => import('@/components/users/UserList')
+            },
+            {
+                path: '/users/roleList',
+                name: '角色管理',
+                iconClass: 'fa fa-user',
+                component: () => import('@/components/users/RoleList')
+            },
+            {
+                path: '/users/permission',
                 name: '权限管理',
                 iconClass: 'fa fa-user',
-                component: () => import('@/components/users/User')
+                component: () => import('@/components/users/Permission')
             },
         ]
     },

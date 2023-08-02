@@ -2,19 +2,13 @@
     <div class="pageing">
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total" :url="url">
+            :total="total">
         </el-pagination>
     </div>
 </template>
 
-<!-- <script setup>
-
-import { getTableData } from '@/api/table'
-const { props, data, onCreated } = defineProps(['total', 'url', 'loading', 'tableData']);
-const pageStart = ref(1)
-
-</script> -->
 <script>
+import {getTableData2} from '@/api/table.js'
 export default {
     props: {
         'total': Number,
@@ -29,17 +23,17 @@ export default {
         }
     },
     created() {
-        getTableData(this.$parent, this.url)
+        getTableData2(this.$parent, this.url)
     },
     methods: {
         handleSizeChange(val) {
             this.pageSize = val;
             this.pageStart = 1;
-            getTableData(this.$parent, this.url, { pageSize: 1, pageStart: val });
+            getTableData2(this.$parent, this.url, { pageSize: 1, pageStart: val });
         },
         handleCurrentChange(val) {
             this.pageStart = val;
-            getTableData(this.$parent, this.url, { pageSize: this.pageSize, pageStart: val });
+            getTableData2(this.$parent, this.url, { pageSize: this.pageSize, pageStart: val });
         }
 
     }

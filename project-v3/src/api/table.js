@@ -111,3 +111,17 @@ export function getTableData(tableData, total, loading, url, params){
         throw err
     })
 }
+
+export function getTableData2(root, url, params){
+    root.service.get(url, {params:params || {}})
+    .then(res => {
+        if (res.data.code === 200) {
+            root.tableData = res.data.data.dataList
+            root.total = res.data.data.total
+        }
+        root.loading = false;
+    })
+    .catch(err => {
+        throw err
+    })
+}
