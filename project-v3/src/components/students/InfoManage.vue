@@ -23,18 +23,22 @@
             <el-table-column prop="phone" label="联系方式" align="center" width="150">
             </el-table-column>
             <el-table-column label="操作" align="center">
-                <template slot-scope="scope">
+                <template #default="scope">
+                    <el-button type="primary" size="small" :icon="Edit" @click="editData(scope.row)"></el-button>
+                    <el-button type="danger" size="small" :icon="Delete" @click="removeData(scope.row)"></el-button>
+                </template>
+                <!-- <template slot-scope="scope">
                     <el-button type="primary" size="mini" icon="el-icon-edit" @click="editData(scope.row)"></el-button>
                     <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeData(scope.row)"></el-button>
-                </template>
+                </template> -->
             </el-table-column>
         </el-table>
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
-        <el-dialog :title="state ? '添加學生信息' : '修改学生信息'" :visible.sync="dialogFormVisible" width="500px">
-            <el-form :model="form" :rules="rules" ref="form">
+        <el-dialog :title="state ? '添加學生信息' : '修改学生信息'" v-model="dialogFormVisible" width="500px">
+            <el-form :model="form" :rules="rules" ref="formRef">
                 <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
                     <el-input v-model="form.name" autocomplete="off" id="name"></el-input>
                 </el-form-item>
@@ -64,122 +68,112 @@
                     <el-input v-model="form.motherName" autocomplete="off" id="motherName"></el-input>
                 </el-form-item>
                 <el-form-item label="入校时间" :label-width="formLabelWidth" prop="enrollTime">
-                    <el-date-picker v-model="form.enrollTime" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd"
+                    <el-date-picker v-model="form.enrollTime" format="YYYY 年 MM 月 DD 日" value-format="YYYY-MM-DD"
                         type="date" placeholder="选择日期" id="enrollTime">
                     </el-date-picker>
                 </el-form-item>
             </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="closeInfo('form')">取 消</el-button>
-                <el-button type="primary" @click="onSumbit('form')">确 定</el-button>
-            </div>
+            <template #footer>
+                <span  class="dialog-footer">
+                    <el-button @click="closeInfo(formRef)">取 消</el-button>
+                    <el-button type="primary" @click="onSumbit(formRef)">确 定</el-button>
+                </span>
+            </template>
         </el-dialog>
     </div>
 </template>
-<script>
-import { getData, changeInfo,delData } from '@/api/table.js'
-export default {
-    data() {
-        return {
-            tableData: [],
-            pageStart: 1,
-            pageSize: 10,
-            total: 0,
-            formInline: {
-                name: ''
-            },
-            dialogFormVisible: false,
-            form: {
-                name: '',
-                age: '',
-                sex: '',
-                number: '',
-                clazz: '',
-                address: '',
-                phone: '',
-                fatherName: '',
-                motherName: '',
-                enrollTime: ''
-            },
-            formLabelWidth: '80px',
-            rules: {
-                name: [{ required: true, message: '请输入姓名' }],
-                age: [{ required: true, message: '请输入年龄' }],
-                sex: [{ required: true, message: '请输入性别' }],
-                number: [{ required: true, message: '请输入学号' }],
-                clazz: [{ required: true, message: '请输入班级' }],
-                address: [{ required: true, message: '请输入地址' }],
-                enrollTime: [{ required: true, message: '请输入入学时间' }],
-                phone: [{ required: true, message: '请输入联系方式' }]
-            },
-            state: true,
-            getDataUrl: '/v1/student/getStudentList'
+<script setup>
+import {  Check, Delete, Edit, Message, Search, Star } from '@element-plus/icons-vue';
+import { getData, changeInfo,delData } from '@/api/table.js';
+import {ElMessage, ElMessageBox} from "element-plus";
+import { onMounted, reactive, ref, nextTick, getCurrentInstance} from 'vue';
+const tableData = ref([]);
+const pageStart = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const formInline = reactive({
+    name: ''
+});
+const dialogFormVisible = ref(false);
+const intiForm = {
+    name: '',
+    age: '',
+    sex: '1',
+    number: '',
+    clazz: '',
+    address: '',
+    phone: '',
+    fatherName: '',
+    motherName: '',
+    enrollTime: ''
+};
+const form = reactive({...intiForm});
+const formLabelWidth = '80px';
+const rules = {
+    name: [{ required: true, message: '请输入姓名' }],
+    age: [{ required: true, message: '请输入年龄' }],
+    sex: [{ required: true, message: '请输入性别' }],
+    number: [{ required: true, message: '请输入学号' }],
+    clazz: [{ required: true, message: '请输入班级' }],
+    address: [{ required: true, message: '请输入地址' }],
+    enrollTime: [{ required: true, message: '请输入入学时间' }],
+    phone: [{ required: true, message: '请输入联系方式' }]
+};
+const state = ref(true);
+const getDataUrl = '/v1/student/getStudentList';
+const { proxy } = getCurrentInstance();
+
+onMounted(()=> {
+    getData(tableData,total, getDataUrl)
+})
+const handleSizeChange = (val) => {
+    // console.log(`每页 ${val} 条`);
+    pageSize.value = val;
+    pageStart.value = 1;
+    getData(tableData,total, getDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+}
+const handleCurrentChange = (val) => {
+    // console.log(`当前页: ${val}`);
+    pageStart.value = val;
+    getData(tableData,total, getDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+}
+
+const formRef = ref(null);
+const closeInfo = (formRef) => {
+    dialogFormVisible.value = false;
+    nextTick(() => {
+        formRef.value?.resetFields();
+    });
+}
+const removeData = (row) => {
+    delData(tableData, total, '/v1/student/removeStudentInfo', row.id, getData, getDataUrl)
+}
+const editData = (row) => {
+    state.value = false;
+    console.log(row);
+    dialogFormVisible.value = true;
+    // form = { ...row };
+    Object.assign(form, row);
+}
+const addStudent = () => {
+    state.value = true;
+    dialogFormVisible.value = true;
+    nextTick(() => {
+        formRef.value?.resetFields();
+    });
+}
+const onSumbit = (formRef) => {
+    // console.log(form, this.form);
+    formRef.validate(vaild => {
+        if (vaild) {
+            let methodUrl = state.value ? '/v1/student/addStudentInfo' : '/v1/student/editStudentInfo';
+            changeInfo(tableData, total, dialogFormVisible, pageStart, methodUrl, form, getData,getDataUrl);
+            // this.$refs[form].resetFields();
         }
-    },
-    created() {
-        getData(this, this.getDataUrl)
-    },
-    methods: {
-        
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-            this.pageSize = val;
-            this.pageStart = 1;
-            getData(this, this.getDataUrl, { pageSize: this.pageSize, pageStart: this.pageStart, name: this.formInline.name });
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
-            this.pageStart = val;
-            getData(this, this.getDataUrl,{ pageSize: this.pageSize, pageStart: this.pageStart, name: this.formInline.name });
-        },
-        closeInfo(form) {
-            this.dialogFormVisible = false;
-            this.$refs[form].resetFields();
-        },
-        removeData(row) {
-            delData(this, '/v1/student/removeStudentInfo', row.id, getData, this.getDataUrl)
-        },
-        editData(row) {
-            this.state = false;
-            console.log(row);
-            this.dialogFormVisible = true;
-            this.form = { ...row };
-        },
-        addStudent() {
-            this.form = {
-                name: '',
-                age: '',
-                sex: '1',
-                number: '',
-                clazz: '',
-                address: '',
-                phone: '',
-                fatherName: '',
-                motherName: '',
-                enrollTime: ''
-            };
-            this.state = true;
-            this.dialogFormVisible = true;
-        },
-        onSumbit(form) {
-            // console.log(form, this.form);
-            this.$refs[form].validate(vaild => {
-                if (vaild) {
-                    // if (this.state) {
-                    //     changeInfo(this, '/v1/student/addStudentInfo', this.form, getData,'/v1/student/getStudentList')
-                    // } else {
-                    //     changeInfo(this, '/v1/student/editStudentInfo', this.form, getData,'/v1/student/getStudentList')
-                    // }
-                    let methodUrl = this.state ? '/v1/student/addStudentInfo' : '/v1/student/editStudentInfo';
-                    changeInfo(this, methodUrl, this.form, getData,this.getDataUrl);
-                    this.$refs[form].resetFields();
-                }
-            })
-        },
-        sexText(row, cloumn) {
-            return row.sex === 1 ? '男' : '女';
-        }
-    }
+    })
+}
+const sexText = (row, cloumn) => {
+    return row.sex === 1 ? '男' : '女';
 }
 </script>
 

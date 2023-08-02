@@ -7,7 +7,7 @@ module.exports = defineConfig({
     // proxy: 'http://u6w7rm.natappfree.cc/'
     proxy:{
       '/api':{
-        target:'http://192.168.219.36:8085/api/',
+        target:'http://localhost:8085/api/',
         changeOrigin:true,  //允许跨域
         pathRewrite:{
           '^/api':''

@@ -32,53 +32,45 @@
         </el-pagination>
     </div>
 </template>
-<script>
+<script setup>
+
 import {getTableData } from '@/api/table'
-export default {
-    data() {
-        return {
-            tableData: [],
-            pageStart: 1,
-            pageSize: 10,
-            total: 0,
-            formInline: {
-                title: ''
-            },
-            getTableDataUrl: '/v1/homework/getHomeworkList',
-            loading: true
-        }
-    },
-    created() {
-        getTableData(this, this.getTableDataUrl)
-    },
-    methods: {
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-            this.pageSize = val;
-            this.pageStart = 1;
-            getTableData(this, this.getTableDataUrl,{ pageSize: this.pageSize, pageStart: this.pageStart,title:this.formInline.title});
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
-            this.pageStart = val;
-            getTableData(this, this.getTableDataUrl,{ pageSize: this.pageSize, pageStart: this.pageStart,title:this.formInline.title });
-        },
-        findHomeword() {
-            getTableData(this, this.getTableDataUrl, this.formInline);
-        },
-        resetCondition() {
-            this.formInline = {}
-            getTableData(this, this.getTableDataUrl,this.formInline);
-        },
-        completedText(row, cloumn) {
-            return row.completed ? '是' : '否';
-        }
-    },
-    computed: {
-        
-    }
+import { reactive,ref, onMounted } from 'vue';
+const tableData = ref([]);
+const pageStart = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const formInline = reactive({
+    title: ''
+});
+const getTableDataUrl = '/v1/homework/getHomeworkList';
+const loading = ref(true);
+onMounted(() => {
+    getTableData(tableData, total,loading, getTableDataUrl)
+})
+const handleSizeChange = (val) => {
+    // console.log(`每页 ${val} 条`);
+    pageSize.value = val;
+    pageStart.value = 1;
+    getTableData(tableData, total,loading, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
+}
+const handleCurrentChange = (val) => {
+    // console.log(`当前页: ${val}`);
+    pageStart.value = val;
+    getTableData(tableData, total,loading, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
+}
+const findHomeword = () => {
+    getTableData(tableData, total,loading, getTableDataUrl, formInline);
+}
+const resetCondition = () => {
+    formInline.title = '';
+    getTableData(tableData, total,loading, getTableDataUrl,formInline);
+}
+const completedText = (row, cloumn) => {
+    return row.completed ? '是' : '否';
 }
 </script>
+
 
 <style lang="scss" scoped>
 .homeworkList {

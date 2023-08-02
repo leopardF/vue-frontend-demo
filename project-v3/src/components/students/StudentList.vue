@@ -30,7 +30,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
                 <template #default="scope">
-                    <el-button type="danger" size="mini" :icon="Delete" @click="removeData(scope.row)"></el-button>
+                    <el-button type="danger" size="small" :icon="Delete" @click="removeData(scope.row)"></el-button>
                 </template>
                 <!-- <template slot-scope="scope">
                     <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeData(scope.row)"></el-button>
@@ -53,74 +53,69 @@ import {
   Search,
   Star,
 } from '@element-plus/icons-vue'
-</script>
-<script>
 import { getStudentList, removeStudent } from '@/api/api.js'
+import { onMounted, reactive, ref} from 'vue'
+import {ElMessage} from "element-plus";
 
-export default {
-    data() {
-        return {
-            tableData: [],
-            pageStart: 1,
-            pageSize: 10,
-            total: 0,
-            formInline: {
-                name: ''
+let tableData = ref([]);
+let pageStart = ref(1);
+let pageSize = ref(10);
+let total = ref(0);
+let formInline = reactive({
+    name: ''
+})
+const getData = (params) => {
+    getStudentList(params)
+        .then(res => {
+            if (res.data.code === 200) {
+                tableData.value = res.data.data.dataList;
+                total.value = res.data.data.total;
             }
-        }
-    },
-    created() {
-        this.getData()
-    },
-    methods: {
-        getData(params) {
-            getStudentList(params)
-                .then(res => {
-                    console.log(res)
-                    if (res.data.code === 200) {
-                        this.tableData = res.data.data.dataList
-                        this.total = res.data.data.total
-                    }
-                })
-        },
-        handleSizeChange(val) {
-            console.log(`每页 ${val} 条`);
-            this.pageSize = val;
-            this.pageStart = 1;
-            this.getData({ pageSize: this.pageSize, pageStart: this.pageStart,name:this.formInline.name});
-        },
-        handleCurrentChange(val) {
-            console.log(`当前页: ${val}`);
-            this.pageStart = val;
-            this.getData({ pageSize: this.pageSize, pageStart: this.pageStart,name:this.formInline.name });
-        },
-        removeData(row) {
-            console.log(row.id)
-            removeStudent({ id: row.id })
-                .then(res => {
-                    console.log(res)
-                    if (res.data.code === 200 && res.data.data === true) {
-                        this.$message({ message: '删除成功', type: 'success' })
-                    }
-                })
-        },
-        findStudent() {
-            this.getData(this.formInline);
-        },
-        resetCondition() {
-            this.formInline = {}
-            this.getData(this.formInline);
-        },
-        sexText(row, cloumn) {
-            return row.sex === 1 ? '男' : '女';
-        },
-        stateText(row, cloumn) {
-            return row.state === 1 ? '已入学' :
-            row.state === 2 ? '未入学' : '休学中';
-        }
-    }
+        })
+}
+
+onMounted(() => {
+    getData()
+})
+const handleSizeChange = (val) => {
+    // console.log(`每页 ${val} 条`);
+    pageSize.value = val;
+    pageStart.value = 1;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value,name:formInline.name});
+}
+
+const handleCurrentChange = (val) => {
+    // console.log(`current page: ${val}`)
+    pageStart.value = val;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value,name:formInline.name });
+}
+
+const removeData = (row) => {
+    console.log(row.id)
+    removeStudent({ id: row.id })
+        .then(res => {
+            console.log(res)
+            if (res.data.code === 200 && res.data.data === true) {
+                ElMessage({ message: '删除成功', type: 'success' });
+            }
+        })
+}
+const findStudent = () => {
+    getData(formInline);
+}
+const resetCondition = () => {
+    formInline.name = '';
+    getData(formInline);
+}
+const sexText = (row, cloumn) => {
+    return row.sex === 1 ? '男' : '女';
+}
+const stateText = (row, cloumn) => {
+    return row.state === 1 ? '已入学' :
+    row.state === 2 ? '未入学' : '休学中';
 }
 </script>
+
 
 <style lang="scss" scoped>
 .studentList {

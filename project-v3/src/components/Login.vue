@@ -46,13 +46,12 @@ export default {
                     console.log(this.form);
                     
                     login(this.form).then(res => {
-                        console.log(res);
                         if(res.data.code === 200){
                             // localStorage.setItem('username',res.data.username)
                             setToken("username" ,res.data.data.username )
                             setToken("token" ,res.data.data.token )
                             this.$message({message: res.data.message, type:'success'})
-                            this.$router.push('/home')
+                            this.$router.push(this.$route.query.redirect || '/home')
                         }
                     })
                     .catch(err => {

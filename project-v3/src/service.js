@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "./utils/setToken.js";
 import {ElMessage} from "element-plus";
+import router from './router'
 
 const service = axios.create({
     baseURL:'/api', //baseURL会自动加载在请求地址上
@@ -24,6 +25,9 @@ service.interceptors.response.use((response)=>{
     //对响应数据做。。。
     let {code,message} = response.data;
     if(code !== 200){
+        if (code === 401){
+            router.replace('/401')
+        }
         ElMessage({message: message || 'error', type:'warning'})
     }
     return response;

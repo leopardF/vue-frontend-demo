@@ -1,11 +1,14 @@
+import service from "@/service";
+import qs from 'qs';
+import {ElMessage, ElMessageBox} from "element-plus";
 
 //获取表格数据
-export function getData(root, url, params) {
-    root.service.get(url, { params: params || {} })
+export function getData(tableData, total, url, params) {
+    service.get(url, { params: params || {} })
         .then(res => {
             if (res.data.code === 200) {
-                root.tableData = res.data.data.dataList
-                root.total = res.data.data.total
+                tableData.value = res.data.data.dataList
+                total.value = res.data.data.total
             }
         })
         .catch(err => {
@@ -14,19 +17,19 @@ export function getData(root, url, params) {
 }
 
 // 新增和修改方法的封装
-import qs from 'qs'
-export function changeInfo(root, url, form, callback, callbackUrl) {
+
+export function changeInfo(tableData, total,dialogFormVisible, pageStart, url, form, callback, callbackUrl) {
     // let data = qs.stringify(form);
-    root.service.post(url, form)
+    service.post(url, form)
         .then(res => {
             if (res.data.code === 200) {
-                root.$message({ message: '操作成功', type: 'success' })
+                ElMessage({ message: '操作成功', type: 'success' })
             } else {
-                root.$message({ message: '操作失败', type: 'error' })
+                ElMessage({ message: '操作失败', type: 'error' })
             }
-            root.dialogFormVisible = false;
-            root.pageStart = 1;
-            callback(root, callbackUrl);
+            dialogFormVisible.value = false;
+            pageStart.value = 1;
+            callback(tableData,total, callbackUrl);
         })
         .catch(err => {
             throw err
@@ -52,36 +55,57 @@ export function changeInfo(root, url, form, callback, callbackUrl) {
 // }
 
 //删除方法封装
-export function delData(root, url, id, callback, callbackUrl) {
-    root.$alert('确定要删除吗？', '提示', {
-        confirmButtonText: '确定',
-        callback: () => {
-            root.service.post(url, { id: id })
-                .then(res => {
-                    console.log(res)
-                    if (res.data.code === 200 && res.data.data === true) {
-                        root.$message({ message: '删除成功', type: 'success' })
-                    }
-                    callback(root, callbackUrl);
-                })
-                .catch(err => {
-                    throw err
-                })
-        }
-    })
+export function delData(tableData,total, url, id, callback, callbackUrl) {
+    // root.$alert('确定要删除吗？', '提示', {
+    //     confirmButtonText: '确定',
+    //     callback: () => {
+    //         service.post(url, { id: id })
+    //             .then(res => {
+    //                 console.log(res)
+    //                 if (res.data.code === 200 && res.data.data === true) {
+    //                     ElMessage({ message: '删除成功', type: 'success' })
+    //                 }
+    //                 callback(tableData,total, callbackUrl);
+    //             })
+    //             .catch(err => {
+    //                 throw err
+    //             })
+    //     }
+    // })
+    ElMessageBox.confirm('确定要删除吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '关闭',
+            type: 'warning',
+        })
+        .then(() => {
+            service.post(url, { id: id })
+            .then(res => {
+                console.log(res)
+                if (res.data.code === 200 && res.data.data === true) {
+                    ElMessage({ message: '删除成功', type: 'success' })
+                }
+                callback(tableData,total, callbackUrl);
+            })
+            .catch(err => {
+                throw err
+            })
+        })
+        .catch(() => {
+            ElMessage({ message: '已取消', type: 'success' })
+        })
 }
 
 // ============================================================
 
 //作业列表获取表格数据方法
-export function getTableData(root, url, params){
-    root.service.get(url, {params:params || {}})
+export function getTableData(tableData, total, loading, url, params){
+    service.get(url, {params:params || {}})
     .then(res => {
         if (res.data.code === 200) {
-            root.tableData = res.data.data.dataList
-            root.total = res.data.data.total
+            tableData.value = res.data.data.dataList
+            total.value = res.data.data.total
         }
-        root.loading = false;
+        loading.value = false;
     })
     .catch(err => {
         throw err

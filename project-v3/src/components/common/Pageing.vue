@@ -7,12 +7,20 @@
     </div>
 </template>
 
-<script>
+<!-- <script setup>
+
 import { getTableData } from '@/api/table'
+const { props, data, onCreated } = defineProps(['total', 'url', 'loading', 'tableData']);
+const pageStart = ref(1)
+
+</script> -->
+<script>
 export default {
     props: {
         'total': Number,
-        'url': String
+        'url': String,
+        'loading': Boolean,
+        'tableData': Array
     },
     data() {
         return {

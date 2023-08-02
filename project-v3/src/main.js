@@ -15,17 +15,5 @@ app.config.globalProperties.service = service
 app.config.globalProperties.$echarts = echarts
 
 
-//路由导航守卫
-router.beforeEach((to, from, next) => {
-    if (!localStorage.getItem("token")) {
-        if (to.path !== '/login') {
-            next('/login')
-        } else {
-            next()
-        }
-    } else {
-        next()
-    }
-})
 
 app.use(ElementPlus, { locale }).use(router).mount('#app')

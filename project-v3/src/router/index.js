@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory}  from 'vue-router'
+import { getCurrentInstance } from 'vue';
 
 const routes = [
     {
         path: '/',
         hidden: true,
+        name: '首页',
         component: () => import('@/components/Login')
     },
     {
@@ -17,6 +19,18 @@ const routes = [
         path: '/:catchAll(.*)',
         hidden: true,
         component: () => import('@/components/NotFound')
+    },
+    {
+        name: 'NotPermission',
+        path: '/401',
+        hidden: true,
+        component: () => import('@/components/NotPermission')
+    },
+    {
+        name: 'Admin',
+        path: '/admin',
+        hidden: true,
+        component: () => import('@/components/Admin')
     },
     {
         name: '学生管理',
@@ -110,5 +124,53 @@ const router = createRouter({
     routes
 })
 
+//路由导航守卫
+const whiteList = ['/login','/404','/401'];
+router.beforeEach((to, from, next) => {
+    if (!localStorage.getItem("token")) {
+        // if (to.path !== '/login') {
+        if (!whiteList.includes(to.path)) {
+            next('/login?redirect=' + to.path )
+        } else {
+            next()
+        }
+    } else {
+        
+        // 后续的是否登录应该从本地存储获取后重新验证
+        // 判断是否已经动态生成莱单
+        // 如果生成 next
+        // 否则现场请求后台生成菜巾
+
+        next()
+        //判断动态路由菜单
+        // if( 'xx' === undefined){    //临时写个，判断存在菜单
+        //     next()
+        // }else{
+        //     //没有菜单
+        //     //发请求获取路由生成菜单
+        //     loadMenus( next, to );
+        // }
+
+    }
+})
+
+import axios from 'axios' 
+
+function loadMenus(next , to){
+
+    //发起请求获取后端路由接口数据
+    axios.post("/")
+    .then( res => {
+
+    })
+    .catch( err => {
+
+    })
+
+    //处理 ‘xxx’
+
+    // 最终放行
+    next({...to, replace:true});
+}
 
 export default router
