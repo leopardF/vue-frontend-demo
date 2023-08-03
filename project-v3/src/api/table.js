@@ -18,6 +18,40 @@ export function getData(tableData, total, url, params) {
 
 // 新增和修改方法的封装
 
+export function addInfo(tableData, total,dialogFormVisible, pageStart, url, form, callback, callbackUrl) {
+    // let data = qs.stringify(form);
+    service.post(url, form)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage({ message: '新增成功', type: 'success' })
+            } else {
+                ElMessage({ message: '新增失败', type: 'error' })
+            }
+            dialogFormVisible.value = false;
+            pageStart.value = 1;
+            callback(tableData,total, callbackUrl);
+        })
+        .catch(err => {
+            throw err
+        })
+}
+
+export function updateInfo(tableData, total,dialogFormVisible, url, form, callback, callbackUrl) {
+    // let data = qs.stringify(form);
+    service.post(url, form)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage({ message: '更新成功', type: 'success' })
+            } else {
+                ElMessage({ message: '更新失败', type: 'error' })
+            }
+            dialogFormVisible.value = false;
+            callback(tableData,total, callbackUrl);
+        })
+        .catch(err => {
+            throw err
+        })
+}
 export function changeInfo(tableData, total,dialogFormVisible, pageStart, url, form, callback, callbackUrl) {
     // let data = qs.stringify(form);
     service.post(url, form)
