@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { nameRule,passRule} from '../utils/vaildate.js'
+import { loginNameRule,passRule} from '../utils/vaildate.js'
 import { setToken} from '@/utils/setToken.js'
 import {login} from '@/api/api.js'
 export default {
@@ -34,7 +34,7 @@ export default {
                 password: ''
             },
             rules:{
-                username:[{validator:nameRule,trigger:'blur'}],
+                username:[{validator:loginNameRule,trigger:'blur'}],
                 password:[{validator:passRule,trigger:'blur'}]
             }
         }

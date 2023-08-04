@@ -90,22 +90,7 @@ export function changeInfo(tableData, total,dialogFormVisible, pageStart, url, f
 
 //删除方法封装
 export function delData(tableData,total, url, id, callback, callbackUrl) {
-    // root.$alert('确定要删除吗？', '提示', {
-    //     confirmButtonText: '确定',
-    //     callback: () => {
-    //         service.post(url, { id: id })
-    //             .then(res => {
-    //                 console.log(res)
-    //                 if (res.data.code === 200 && res.data.data === true) {
-    //                     ElMessage({ message: '删除成功', type: 'success' })
-    //                 }
-    //                 callback(tableData,total, callbackUrl);
-    //             })
-    //             .catch(err => {
-    //                 throw err
-    //             })
-    //     }
-    // })
+
     ElMessageBox.confirm('确定要删除吗？', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '关闭',
@@ -132,14 +117,13 @@ export function delData(tableData,total, url, id, callback, callbackUrl) {
 // ============================================================
 
 //作业列表获取表格数据方法
-export function getTableData(tableData, total, loading, url, params){
+export function getTableData(tableData, total, url, params){
     service.get(url, {params:params || {}})
     .then(res => {
         if (res.data.code === 200) {
             tableData.value = res.data.data.dataList
             total.value = res.data.data.total
         }
-        loading.value = false;
     })
     .catch(err => {
         throw err

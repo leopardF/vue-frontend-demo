@@ -5,9 +5,12 @@
                 <el-button type="primary" @click="addUser">新增</el-button>
             </el-form-item>
         </el-form>
-        <el-table :data="tableData" border style="width: 300px">
-            <el-table-column prop="userName" label="角色名" align="center" width="150">
-            </el-table-column>
+        <el-table :data="tableData" border style="width: 900px">
+            <el-table-column prop="loginName" label="登录名" align="center" width="150"></el-table-column>
+            <el-table-column prop="userName" label="用户" align="center" width="150"></el-table-column>
+            <el-table-column prop="telephone" label="手机号" align="center" width="150"></el-table-column>
+            <el-table-column prop="loginCount" label="登录次数" align="center" width="150"></el-table-column>
+            <el-table-column prop="lastLoginTime" label="最后登录时间" align="center" width="150"></el-table-column>
             <el-table-column label="操作" align="center" width="150">
                 <template #default="scope">
                     <el-button type="primary" size="small" :icon="Edit" @click="editData(scope.row)"></el-button>
@@ -19,10 +22,16 @@
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
-        <el-dialog :title="state ? '添加角色信息' : '修改角色信息'" v-model="dialogFormVisible" width="500px">
+        <el-dialog :title="state ? '添加后台用户信息' : '修改后台用户信息'" v-model="dialogFormVisible" width="500px">
             <el-form :model="form" :rules="rules" ref="formRef">
-                <el-form-item label="角色名" :label-width="formLabelWidth" prop="userName">
+                <el-form-item label="登录名" :label-width="formLabelWidth" prop="loginName">
+                    <el-input v-model="form.loginName" autocomplete="off" id="loginName"></el-input>
+                </el-form-item>
+                <el-form-item label="用户" :label-width="formLabelWidth" prop="userName">
                     <el-input v-model="form.userName" autocomplete="off" id="userName"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" :label-width="formLabelWidth" prop="telephone">
+                    <el-input v-model="form.telephone" autocomplete="off" id="telephone"></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -47,39 +56,48 @@ import {
 import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js'
 import {ElMessage, ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref, nextTick} from 'vue'
+import { loginNameRule,userNameRule,telephoneRule } from '@/utils/vaildate.js'
 const tableData = ref([]);
 const pageStart = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
-    userName: ''
+    searchName: ''
 });
 const dialogFormVisible = ref(false);
 const initForm = {
+    loginName: '',
     userName: '',
+    telephone: '',
 };
 const form = reactive({...initForm});
 const formLabelWidth = '80px';
 const rules = {
-    userName: [{ required: true, message: '请输入角色名' }],
+    // userName: [{ required: true, message: '请输入角色名' }],
+    loginName: [{ required: true, validator:loginNameRule,trigger:'blur'}],
+    userName: [{ required: true, validator:userNameRule,trigger:'blur'}],
+    telephone: [{ required: true, validator:telephoneRule,trigger:'blur'}]
 };
 const state = ref(true);
-const getTableDataUrl = '/v1/user/getUserList';
+const getTableDataUrl = '/v1/user/getBackgroundUserList';
 const loading = ref(true);
 
 onMounted(()=>{
-    getTableData(tableData, total,loading, getTableDataUrl);
+    getTableData(tableData, total, getTableDataUrl);
+    loading.value = false;
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    getTableData(tableData, total,loading, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    loading.value = false;
 }
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    getTableData(tableData, total,loading, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    loading.value = false;
 }
 
 const formRef = ref(null);
@@ -90,7 +108,7 @@ const closeInfo = (formRef) => {
     });
 };
 const removeData = (row) => {
-    delData(tableData,total, "/v1/user/delUser", row.id, callback, callbackUrl)
+    delData(tableData,total, "/v1/user/removeBackgroundUserInfo", row.id, getTableData, getTableDataUrl)
 }
 const editData = (row) => {
     state.value = false;
@@ -111,9 +129,9 @@ const onSumbit = (formRef) => {
     formRef.validate(vaild => {
         if (vaild) {
             if (state.value) {
-                addInfo(tableData, total,dialogFormVisible, pageStart, "/v1/user/addUser", form, getTableData, getTableDataUrl)
+                addInfo(tableData, total,dialogFormVisible, pageStart, "/v1/user/addBackgroundUserInfo", form, getTableData, getTableDataUrl)
             } else {
-                updateInfo(tableData, total,dialogFormVisible, "/v1/user/updateUser", form, getTableData, getTableDataUrl)
+                updateInfo(tableData, total,dialogFormVisible, "/v1/user/editBackgroundUserInfo", form, getTableData, getTableDataUrl)
             }
         } else {
             // 验证不通过，显示错误信息

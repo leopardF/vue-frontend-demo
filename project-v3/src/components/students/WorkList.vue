@@ -46,25 +46,34 @@ const formInline = reactive({
 const getTableDataUrl = '/v1/homework/getHomeworkList';
 const loading = ref(true);
 onMounted(() => {
-    getTableData(tableData, total,loading, getTableDataUrl)
+    getTableData(tableData, total, getTableDataUrl)
+    loading.value = false;
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    getTableData(tableData, total,loading, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
+    loading.value = true;
+    getTableData(tableData, total, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
+    loading.value = false;
 }
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    getTableData(tableData, total,loading, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
+    loading.value = true;
+    getTableData(tableData, total, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
+    loading.value = false;
 }
 const findHomeword = () => {
-    getTableData(tableData, total,loading, getTableDataUrl, formInline);
+    loading.value = true;
+    getTableData(tableData, total, getTableDataUrl, formInline);
+    loading.value = false;
 }
 const resetCondition = () => {
     formInline.title = '';
+    loading.value = true;
     getTableData(tableData, total,loading, getTableDataUrl,formInline);
+    loading.value = false;
 }
 const completedText = (row, cloumn) => {
     return row.completed ? '是' : '否';

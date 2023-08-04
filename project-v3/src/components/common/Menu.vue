@@ -1,7 +1,7 @@
 <template>
     <div class="menu">
         <el-aside width="200px">
-            <el-menu router :default-active="activePath" class="el-menu-vertical-demo" background-color="#358de4" text-color="#fff"
+            <el-menu router :default-active="activePath" class="el-menu-vertical-demo" background-color="#42a1ed" text-color="#fff"
                 active-text-color="#ffd04b">
                 <template v-for="(item, index) in menus">
                     <el-sub-menu :index="index + ''" :key="index" v-if="!item.hidden">
@@ -37,11 +37,15 @@ const activePath = router.currentRoute.value.path
             .fa{
                 margin-right: 10px;
             }
+            .el-menu-item {
+                background-color: #669ed5;
+            }
         }
 
         .el-submenu .el-menu-item {
             min-width: 0;
         }
+
     }
 }
 </style>

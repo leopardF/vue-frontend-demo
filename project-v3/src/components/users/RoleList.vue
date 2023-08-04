@@ -25,6 +25,7 @@
                     <el-input v-model="form.roleName" autocomplete="off" id="roleName"></el-input>
                 </el-form-item>
             </el-form>
+            <RolePermission  @handleGetCheckedNodesMethod="handleGetCheckedNodes" ref="rolePermissionRef" />
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="closeInfo(formRef)">取 消</el-button>
@@ -43,10 +44,13 @@ import {
   Message,
   Search,
   Star,
-} from '@element-plus/icons-vue'
-import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js'
+} from '@element-plus/icons-vue';
+import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js';
 import {ElMessage, ElMessageBox} from "element-plus";
-import { onMounted, reactive, ref, nextTick} from 'vue'
+import { onMounted, reactive, ref, nextTick, getCurrentInstance } from 'vue';
+import RolePermission from './RolePermission.vue';
+
+const { proxy } = getCurrentInstance();
 const tableData = ref([]);
 const pageStart = ref(1);
 const pageSize = ref(10);
@@ -68,18 +72,21 @@ const getTableDataUrl = '/v1/role/getRoleList';
 const loading = ref(true);
 
 onMounted(()=>{
-    getTableData(tableData, total,loading, getTableDataUrl);
+    getTableData(tableData, total, getTableDataUrl);
+    loading.value = false;
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    getTableData(tableData, total,loading, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    loading.value = false;
 }
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    getTableData(tableData, total,loading, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    loading.value = false;
 }
 
 const formRef = ref(null);
@@ -90,7 +97,8 @@ const closeInfo = (formRef) => {
     });
 };
 const removeData = (row) => {
-    delData(tableData,total, "/v1/role/delRole", row.id, callback, callbackUrl)
+    delData(tableData,total, "/v1/role/removeRoleInfo", row.id, getTableData, getTableDataUrl);
+    loading.value = false;
 }
 const editData = (row) => {
     state.value = false;
@@ -107,13 +115,14 @@ const addRole = () => {
 }
 
 const onSumbit = (formRef) => {
+    callChildMethod();
     // console.log(formRef, 'formRef2');
     formRef.validate(vaild => {
         if (vaild) {
             if (state.value) {
-                addInfo(tableData, total,dialogFormVisible, pageStart, "/v1/role/addRole", form, getTableData, getTableDataUrl)
+                addInfo(tableData, total,dialogFormVisible, pageStart, "/v1/role/addRoleInfo", form, getTableData, getTableDataUrl);
             } else {
-                updateInfo(tableData, total,dialogFormVisible, "/v1/role/updateRole", form, getTableData, getTableDataUrl)
+                updateInfo(tableData, total,dialogFormVisible, "/v1/role/updateRoleInfo", form, getTableData, getTableDataUrl)
             }
         } else {
             // 验证不通过，显示错误信息
@@ -121,6 +130,21 @@ const onSumbit = (formRef) => {
         }
     })
 }
+
+const handleGetCheckedNodes = (checkedList) => {
+  console.log('父级接收到 el-tree 的选择:', checkedList);
+};
+
+// 使用 ref 创建子组件的引用
+const rolePermissionRef = ref(null);
+
+// 调用子组件的暴露方法
+const callChildMethod = () => {
+    rolePermissionRef.value = rolePermissionRef.value || rolePermissionRef.$refs.rolePermissionRef;
+    if (rolePermissionRef.value) {
+        rolePermissionRef.value.exposeMethod();
+    }
+};
 </script>
 
 <style scoped lang="scss">

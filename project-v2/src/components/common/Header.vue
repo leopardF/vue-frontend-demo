@@ -2,7 +2,11 @@
     <div class="header">
         <el-header>
             <div class="title">通用后台管理系统</div>
-            <div>{{ name }}</div>
+            <div>
+                <i class="fa fa-user"></i>
+                {{ name }}
+                <span>退出</span>
+            </div>
         </el-header>
     </div>
 
