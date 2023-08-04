@@ -36,6 +36,21 @@ export function addInfo(tableData, total,dialogFormVisible, pageStart, url, form
         })
 }
 
+export function updateInfoNotTable(url, form) {
+    // let data = qs.stringify(form);
+    service.post(url, form)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage({ message: '更新成功', type: 'success' })
+            } else {
+                ElMessage({ message: '更新失败', type: 'error' })
+            }
+        })
+        .catch(err => {
+            throw err
+        })
+}
+
 export function updateInfo(tableData, total,dialogFormVisible, url, form, callback, callbackUrl) {
     // let data = qs.stringify(form);
     service.post(url, form)

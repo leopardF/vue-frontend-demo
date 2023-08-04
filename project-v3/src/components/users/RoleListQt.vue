@@ -25,7 +25,7 @@
                     <el-input v-model="form.roleName" autocomplete="off" id="roleName"></el-input>
                 </el-form-item>
             </el-form>
-            <RolePermission :roleId="currentRoleId" v-if="!state"/>
+            <RolePermission  @handleGetCheckedNodesMethod="handleGetCheckedNodes" ref="rolePermissionRef" />
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="closeInfo(formRef)">取 消</el-button>
@@ -47,9 +47,10 @@ import {
 } from '@element-plus/icons-vue';
 import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js';
 import {ElMessage, ElMessageBox} from "element-plus";
-import { onMounted, reactive, ref, nextTick } from 'vue';
+import { onMounted, reactive, ref, nextTick, getCurrentInstance } from 'vue';
 import RolePermission from './RolePermission.vue';
 
+const { proxy } = getCurrentInstance();
 const tableData = ref([]);
 const pageStart = ref(1);
 const pageSize = ref(10);
@@ -99,11 +100,9 @@ const removeData = (row) => {
     delData(tableData,total, "/v1/role/removeRoleInfo", row.id, getTableData, getTableDataUrl);
     loading.value = false;
 }
-const currentRoleId = ref('');
 const editData = (row) => {
     state.value = false;
     dialogFormVisible.value = true;
-    currentRoleId.value = row.id;
     Object.assign(form, row); //写法类似拷贝行数据的副本，不然直接获取row的话，会是当前行的实时数据
 
 }
@@ -116,6 +115,7 @@ const addRole = () => {
 }
 
 const onSumbit = (formRef) => {
+    callChildMethod();
     // console.log(formRef, 'formRef2');
     formRef.validate(vaild => {
         if (vaild) {
@@ -131,6 +131,19 @@ const onSumbit = (formRef) => {
     })
 }
 
+const handleGetCheckedNodes = (checkedList) => {
+  console.log('父级接收到 el-tree 的选择:', checkedList);
+};
+
+// 使用 ref 创建子组件的引用
+const rolePermissionRef = ref(null);
+// 调用子组件的暴露方法
+const callChildMethod = () => {
+    rolePermissionRef.value = rolePermissionRef.value || rolePermissionRef.$refs.rolePermissionRef;
+    if (rolePermissionRef.value) {
+        rolePermissionRef.value.exposeMethod();
+    }
+};
 </script>
 
 <style scoped lang="scss">
