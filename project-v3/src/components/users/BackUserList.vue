@@ -34,6 +34,7 @@
                     <el-input v-model="form.telephone" autocomplete="off" id="telephone"></el-input>
                 </el-form-item>
             </el-form>
+            <BackUserRole :userId="currentUserId" :roles="roles" v-if="!state"/>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="closeInfo(formRef)">取 消</el-button>
@@ -57,6 +58,7 @@ import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js'
 import {ElMessage, ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref, nextTick} from 'vue'
 import { loginNameRule,userNameRule,telephoneRule } from '@/utils/vaildate.js'
+import BackUserRole from './BackUserRole.vue';
 const tableData = ref([]);
 const pageStart = ref(1);
 const pageSize = ref(10);
@@ -81,6 +83,7 @@ const rules = {
 const state = ref(true);
 const getTableDataUrl = '/v1/user/getBackgroundUserList';
 const loading = ref(true);
+const roles = ref([]);
 
 onMounted(()=>{
     getTableData(tableData, total, getTableDataUrl);
@@ -110,9 +113,14 @@ const closeInfo = (formRef) => {
 const removeData = (row) => {
     delData(tableData,total, "/v1/user/removeBackgroundUserInfo", row.id, getTableData, getTableDataUrl)
 }
+
+const currentUserId = ref('');
 const editData = (row) => {
     state.value = false;
     dialogFormVisible.value = true;
+    currentUserId.value = row.id;
+    getTableData(roles, ref(0), "/v1/role/getRoleList", {"pageSize": 1000});
+    console.log("parent roles " , roles)
     Object.assign(form, row); //写法类似拷贝行数据的副本，不然直接获取row的话，会是当前行的实时数据
 
 }
