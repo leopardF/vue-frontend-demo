@@ -2,6 +2,12 @@ import service from "@/service";
 import qs from 'qs';
 import {ElMessage, ElMessageBox} from "element-plus";
 
+
+//获取对象数据
+export function getDataByUrl(url) {
+    return service.get(url)
+}
+
 //获取表格数据
 export function getData(tableData, total, url, params) {
     service.get(url, { params: params || {} })
@@ -9,6 +15,8 @@ export function getData(tableData, total, url, params) {
             if (res.data.code === 200) {
                 tableData.value = res.data.data.dataList
                 total.value = res.data.data.total
+            } else {
+                ElMessage({ message: '查询失败', type: 'error' })
             }
         })
         .catch(err => {
@@ -138,6 +146,8 @@ export function getTableData(tableData, total, url, params){
         if (res.data.code === 200) {
             tableData.value = res.data.data.dataList
             total.value = res.data.data.total
+        } else {
+            ElMessage({ message: '查询失败', type: 'error' })
         }
     })
     .catch(err => {

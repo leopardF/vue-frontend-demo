@@ -22,6 +22,7 @@
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
+
         <el-dialog :title="state ? '添加后台用户信息' : '修改后台用户信息'" v-model="dialogFormVisible" width="500px">
             <el-form :model="form" :rules="rules" ref="formRef">
                 <el-form-item label="登录名" :label-width="formLabelWidth" prop="loginName">
@@ -34,10 +35,10 @@
                     <el-input v-model="form.telephone" autocomplete="off" id="telephone"></el-input>
                 </el-form-item>
             </el-form>
-            <BackUserRole :userId="currentUserId" :roles="roles" v-if="!state"/>
+            <BackUserRole :userId="currentUserId" :roles="roles" :checkedList="roleIdCheckList" v-if="!state"/>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="closeInfo(formRef)">取 消</el-button>
+                    <el-button @click="closeInfo">取 消</el-button>
                     <el-button type="primary" @click="onSumbit(formRef)">确 定</el-button>
                 </span>
             </template>
@@ -54,9 +55,9 @@ import {
   Search,
   Star,
 } from '@element-plus/icons-vue'
-import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js'
-import {ElMessage, ElMessageBox} from "element-plus";
-import { onMounted, reactive, ref, nextTick} from 'vue'
+import { getTableData, addInfo,updateInfo,delData,getDataByUrl } from '@/api/table.js'
+import {ElMessage} from "element-plus";
+import { onMounted, reactive, ref} from 'vue'
 import { loginNameRule,userNameRule,telephoneRule } from '@/utils/vaildate.js'
 import BackUserRole from './BackUserRole.vue';
 const tableData = ref([]);
@@ -84,56 +85,62 @@ const state = ref(true);
 const getTableDataUrl = '/v1/user/getBackgroundUserList';
 const loading = ref(true);
 const roles = ref([]);
-
 onMounted(()=>{
     getTableData(tableData, total, getTableDataUrl);
     loading.value = false;
-})
+    getTableData(roles, ref(0), "/v1/role/getRoleList", {"pageSize": 1000});
+});
+
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
     getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
     loading.value = false;
-}
+};
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
     getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
     loading.value = false;
-}
-
-const formRef = ref(null);
-const closeInfo = (formRef) => {
+};
+const formRef = ref({});
+const closeInfo = () => {
     dialogFormVisible.value = false;
-    nextTick(() => {
-        formRef.value?.resetFields();
-    });
+    formRef.value?.resetFields();
 };
 const removeData = (row) => {
     delData(tableData,total, "/v1/user/removeBackgroundUserInfo", row.id, getTableData, getTableDataUrl)
-}
-
+};
 const currentUserId = ref('');
+const roleIdCheckList = ref([]);
 const editData = (row) => {
     state.value = false;
-    dialogFormVisible.value = true;
     currentUserId.value = row.id;
-    getTableData(roles, ref(0), "/v1/role/getRoleList", {"pageSize": 1000});
-    console.log("parent roles " , roles)
-    Object.assign(form, row); //写法类似拷贝行数据的副本，不然直接获取row的话，会是当前行的实时数据
 
-}
+    getDataByUrl(`/v1/backUserRole/getBackUserRoleList/` + row.id)
+    .then(res => {
+        if (res.data.code === 200) {
+            roleIdCheckList.value = [];
+            res.data.data.forEach(roleInfo => {
+                roleIdCheckList.value.push(roleInfo.roleId);
+            });
+            Object.assign(form, row);
+            dialogFormVisible.value = true;
+        } else {
+            ElMessage({ message: '查询失败', type: 'error' })
+        }
+    })
+    .catch(err => {
+        throw err
+    })
+};
 const addUser = () => {
     state.value = true;
     dialogFormVisible.value = true;
-    nextTick(() => {
-        formRef.value?.resetFields();
-    });
-}
-
+    Object.assign(form, initForm);
+};
 const onSumbit = (formRef) => {
-    // console.log(formRef, 'formRef2');
     formRef.validate(vaild => {
         if (vaild) {
             if (state.value) {
@@ -148,6 +155,7 @@ const onSumbit = (formRef) => {
     })
 }
 </script>
+
 
 <style scoped lang="scss">
 .userList {

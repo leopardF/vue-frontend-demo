@@ -5,7 +5,7 @@ import router from './router'
 
 const service = axios.create({
     baseURL:'/api', //baseURL会自动加载在请求地址上
-    timeout: 3000,
+    timeout: 8000,
 
 })
 
