@@ -79,10 +79,17 @@ const routes = [
         component: ()=> import('@/components/Home'), //懒加载
         children:[
             {
-                path: '/home/article',
+                path: '/home/articleList',
                 name: '文章管理',
                 iconClass: 'fa fa-file-word-o',
                 component: () => import('@/components/articles/ArticleList')
+            },
+            {
+                path: '/home/articleDetail',
+                name: '文章详情',
+                iconClass: 'fa fa-file-word-o',
+                hidden: true,
+                component: () => import('@/components/articles/ArticleDetail')
             }
         ]
     },

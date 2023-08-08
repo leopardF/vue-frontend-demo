@@ -2,7 +2,10 @@
     <div class="header">
         <el-header>
             <div class="title">通用后台管理系统</div>
-            <div>{{ name }}</div>
+            <div>
+                <i class="fa fa-user"></i>{{ name }}
+                
+            </div>
         </el-header>
     </div>
 
@@ -32,6 +35,9 @@ export default{
         .title{
             width: 200px;
             font-size: 24px;
+        }
+        i{
+            margin-right: 10px;
         }
     }
 }
