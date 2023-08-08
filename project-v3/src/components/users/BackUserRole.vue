@@ -20,18 +20,21 @@
 </template>
 
 <script setup>
-import { computed, ref,watch,defineProps } from "vue";
+import { computed, ref,defineProps,watch,toRefs } from "vue";
 import { updateInfoNotTable } from '@/api/table.js';
 
-const { userId,roles,checkedList } = defineProps(["userId","roles","checkedList"]);
+const props = defineProps(["userId","roles","checkedList"]);
+const {userId,roles,checkedList} = toRefs(props);
 
 const checkedRoles = ref([]);
-const checkAll = checkedList.length === 0 ? ref(null) : ref(false);
-const isIndeterminate = checkedList.length > 0 ? ref(true) : ref(false);
-const roleIds = computed(() => roles.value.map(role => role.id));
-watch(checkedList, newValue => {
-  checkedRoles.value = [...newValue]; // 更新 checkedRoles 的值
-});
+const checkAll = checkedList.value.length === 0 ? ref(null) : checkedList.value.length === roles.value.length ? ref(true) : ref(false);
+const isIndeterminate = checkedList.value.length > 0 ? ref(true) : ref(false);
+const roleIds = computed(() => roles.value?.map(role => role.id));
+
+watch(checkedList, (newValue, oldValue) => {
+    checkedRoles.value = [...newValue];
+    // console.log("new checkedList", newValue);
+}, { immediate: true, deep: true });
 
 const handleCheckAllChange = (val) => {
     checkedRoles.value = val ? roleIds.value : [];
@@ -39,15 +42,15 @@ const handleCheckAllChange = (val) => {
 }
 const handleCheckedRoleChange = (value) => {
     const checkedCount = value.length;
-    checkAll.value = checkedCount === roleIds.value.length;
-    isIndeterminate.value = checkedCount > 0 && checkedCount < roleIds.value.length;
+    checkAll.value = checkedCount === roleIds.length;
+    isIndeterminate.value = checkedCount > 0 && checkedCount < roleIds.length;
 }
 
 
 const updateCheckedNodes = () => {
     let idList = checkedRoles.value;
-    console.log("perPage ",idList);
-    updateInfoNotTable("/v1/backUserRole/updateBackUserRole", {"backgroundUserId":userId , "roleIdList": idList});
+    console.log("perPage idList",idList);
+    updateInfoNotTable("/v1/backUserRole/updateBackUserRole", {"backgroundUserId":userId.value , "roleIdList": idList});
 }
 
 </script>

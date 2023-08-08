@@ -72,6 +72,21 @@ const routes = [
         ]
     },
     {
+        name: '运营管理',
+        path: '/home',
+        iconClass: 'fa fa-file-text',
+        redirect: '/home/studentList',
+        component: ()=> import('@/components/Home'), //懒加载
+        children:[
+            {
+                path: '/home/article',
+                name: '文章管理',
+                iconClass: 'fa fa-file-word-o',
+                component: () => import('@/components/articles/ArticleList')
+            }
+        ]
+    },
+    {
         name: '数据分析',
         path: '/home',
         iconClass: 'fa fa-bar-chart',

@@ -5,7 +5,7 @@
                 <el-button type="primary" @click="addStudent">新增</el-button>
             </el-form-item>
         </el-form>
-        <el-table :data="tableData" border style="width: 100%">
+        <el-table :data="tableData" border style="width: 1150px">
             <el-table-column prop="name" label="姓名" align="center" width="100">
             </el-table-column>
             <el-table-column prop="age" label="年龄" align="center" width="68">
@@ -22,7 +22,7 @@
             </el-table-column>
             <el-table-column prop="phone" label="联系方式" align="center" width="150">
             </el-table-column>
-            <el-table-column label="操作" align="center">
+            <el-table-column label="操作" align="center" width="124">
                 <template #default="scope">
                     <el-button type="primary" size="small" :icon="Edit" @click="editData(scope.row)"></el-button>
                     <el-button type="danger" size="small" :icon="Delete" @click="removeData(scope.row)"></el-button>
@@ -160,6 +160,7 @@ const addStudent = () => {
     dialogFormVisible.value = true;
     nextTick(() => {
         formRef.value?.resetFields();
+        Object.assign(form, intiForm);
     });
 }
 const onSumbit = (formRef) => {
