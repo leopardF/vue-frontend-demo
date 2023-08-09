@@ -12,11 +12,21 @@ const service = axios.create({
 //添加请求拦截器
 service.interceptors.request.use((config)=>{
     //在请求之前做些什么(获取并设置token)
-    config.headers['token'] = getToken('token');
+    const token = getToken('token');
+    // const requestedPath = config.url;
+    // if (token && requestedPath === '/') {
+    //     // Redirect to a specific path
+    //     router.push('/home/studentList'); // Replace with the desired path
+    //   } else {
+        // Set token in the request header
+        config.headers['token'] = token;
+    //   }
+
     return config;
 },(error) => {
     return Promise.reject(error);
 })
+
 
 
 
@@ -27,6 +37,9 @@ service.interceptors.response.use((response)=>{
     if(code !== 200){
         if (code === 401){
             router.replace('/401')
+        }
+        if (code === 404){
+            router.replace('/:catchAll(.*)')
         }
         ElMessage({message: message || 'error', type:'warning'})
     }

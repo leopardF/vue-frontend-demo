@@ -8,6 +8,10 @@ export function getDataByUrl(url) {
     return service.get(url)
 }
 
+export function postDataByUrl(url,form) {
+    return service.post(url, form)
+}
+
 //获取表格数据
 export function getData(tableData, total, url, params) {
     service.get(url, { params: params || {} })

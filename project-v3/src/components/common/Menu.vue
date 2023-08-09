@@ -9,10 +9,10 @@
                             <i :class="item.iconClass"></i>
                             <span>{{ item.name }}</span>
                         </template>
-                            <el-menu-item :index="child.path" v-for="(child, index) in item.children" :key="index">
-                                <i :class="child.iconClass"></i>
-                                {{child.name}}
-                            </el-menu-item>
+                        <el-menu-item :index="child.path" v-for="(child, index) in filteredChildren(item.children)" :key="index">
+                            <i :class="child.iconClass"></i>
+                            {{child.name}}
+                        </el-menu-item>
                     </el-sub-menu>
                 </template>
 
@@ -25,7 +25,11 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const menus = router.options.routes
-const activePath = router.currentRoute.value.path
+const activePath = [router.currentRoute.value.path]
+
+const filteredChildren = (children) => {
+  return children.filter(child => !child.hidden);
+};
 </script>
 <style lang="scss" scoped>
 .menu {

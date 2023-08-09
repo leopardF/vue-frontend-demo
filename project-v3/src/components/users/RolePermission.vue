@@ -18,10 +18,20 @@ const defaultProps = {
 
 const menus = [...proxy.$router.options.routes];
 // console.log(menus , 'menus');
+//只对第一级隐藏
 const filterHiddenRoutes = (routes) => {
     return routes.filter(route => !route.hidden);
 }
-const filteredMenus = filterHiddenRoutes(menus);
+//递归隐藏
+const filterHiddenSubRoutes = (routes) => {
+  return routes.map(route => {
+    if (route.children && route.children.length > 0) {
+      route.children = filterHiddenSubRoutes(route.children);
+    }
+    return route.hidden ? null : route;
+  }).filter(route => route !== null);
+}
+const filteredMenus = filterHiddenSubRoutes(menus);
 
 const updateCheckedNodes = () => {
     let checkedList = proxy.$refs.tree.getCheckedNodes();

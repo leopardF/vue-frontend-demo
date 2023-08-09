@@ -1,8 +1,8 @@
 <template>
   <div class="home">
-    <Header />
+    <Header class="headerClass"/>
     <el-container class="content">
-      <Menu />
+      <Menu class="menuClass"/>
       <el-container>
         <el-main>
           <Bread/>
@@ -31,10 +31,16 @@ import Bread from './common/Breadcrumb.vue';
 .home {
   width: 100%;
   height: 100%;
+  .headerClass{
+    box-shadow: 0 4px 10px lightgreen;
+  }
+  .menuClass{
+    box-shadow: 5px 4px 10px lightgreen;
+  }
   .content{
     position: absolute;
     width: 100%;
-    top: 60px;
+    top: 65px;
     bottom: 0px;
     .cont{
       margin: 20px 0;
