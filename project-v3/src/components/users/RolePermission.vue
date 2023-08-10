@@ -21,8 +21,9 @@ const defaultProps = {
 const packageMenus = (data, menuData) => {
     console.log("111",data , menuData); 
     data.forEach(item => {
-        if(item.children === undefined){
-            item.children = [];
+        const childrenTemp = [];
+        if(item.childrenList && item.childrenList.length > 0){
+            packageMenus(item.childrenList,childrenTemp)
         }
         menuData.push({
             name: item.menuName,
@@ -33,7 +34,7 @@ const packageMenus = (data, menuData) => {
             },
             hidden: item.hidden === undefined ? false : item.hidden,
             component: ()=> import('@/components' + item.pageUrl), //懒加载
-            children: item.childrenList && item.childrenList.length > 0 ? packageMenus(item.childrenList,item.children) : []
+            children: childrenTemp
         })
     })
 }
