@@ -6,36 +6,45 @@ const routes = [
         path: '/',
         hidden: true,
         name: '首页',
-        component: () => import('@/components/Login')
+        meta: {
+            label: '首页',
+        },
+        component: () => import('@/components/Admin')
     },
     {
         name: 'Login',
         path: '/login',
         hidden: true,
+        meta: {
+            label: '登录',
+        },
         component: () => import('@/components/Login')
     },
     {
         name: 'NotFound',
         path: '/:catchAll(.*)',
         hidden: true,
+        meta: {
+            label: '未发现',
+        },
         component: () => import('@/components/NotFound')
     },
     {
         name: 'NotPermission',
         path: '/401',
         hidden: true,
+        meta: {
+            label: '无权限',
+        },
         component: () => import('@/components/NotPermission')
-    },
-    {
-        name: 'Admin',
-        path: '/admin',
-        hidden: true,
-        component: () => import('@/components/Admin')
     },
     {
         name: '学生管理',
         path: '/home',
         iconClass: 'fa fa-users',
+        meta: {
+            label: '学生管理',
+        },
         redirect: '/home/studentList',
         component: ()=> import('@/components/Home'), //懒加载
         children:[
@@ -43,30 +52,45 @@ const routes = [
                 path: '/home/studentList',
                 name: '学生列表',
                 iconClass: 'fa fa-list',
+                meta: {
+                    label: '学生列表',
+                },
                 component: () => import('@/components/students/StudentList')
             },
             {
                 path: '/home/infoList',
                 name: '信息列表',
                 iconClass: 'fa fa-list-alt',
+                meta: {
+                    label: '信息列表',
+                },
                 component: () => import('@/components/students/InfoList')
             },
             {
                 path: '/home/infoManager',
                 name: '信息管理',
                 iconClass: 'fa fa-list-alt',
+                meta: {
+                    label: '信息管理',
+                },
                 component: () => import('@/components/students/InfoManage')
             },
             {
                 path: '/home/workList',
                 name: '作业列表',
                 iconClass: 'fa fa-list-ul',
+                meta: {
+                    label: '作业列表',
+                },
                 component: () => import('@/components/students/WorkList')
             },
             {
                 path: '/home/workManage',
                 name: '作业管理',
                 iconClass: 'fa fa-th-list',
+                meta: {
+                    label: '作业管理',
+                },
                 component: () => import('@/components/students/WorkManage')
             }
         ]
@@ -82,6 +106,9 @@ const routes = [
                 path: '/home/articleList',
                 name: '文章管理',
                 iconClass: 'fa fa-file-word-o',
+                meta: {
+                    label: '文章管理',
+                },
                 component: () => import('@/components/articles/ArticleList')
             },
             {
@@ -89,6 +116,9 @@ const routes = [
                 name: '文章详情',
                 iconClass: 'fa fa-file-word-o',
                 hidden: true,
+                meta: {
+                    label: '文章详情',
+                },
                 component: () => import('@/components/articles/ArticleDetail')
             }
         ]
@@ -103,24 +133,36 @@ const routes = [
                 path: '/home/dataView',
                 name: '数据概览',
                 iconClass: 'fa fa-bar-chart',
+                meta: {
+                    label: '数据概览',
+                },
                 component: () => import('@/components/dataAnalysis/DataView')
             },
             {
                 path: '/home/mapView',
                 name: '地图预览',
                 iconClass: 'fa fa-line-chart',
+                meta: {
+                    label: '地图预览',
+                },
                 component: () => import('@/components/dataAnalysis/MapView')
             },
             {
                 path: '/home/scoreMap',
                 name: '分数地图',
                 iconClass: 'fa fa-line-chart',
+                meta: {
+                    label: '分数地图',
+                },
                 component: () => import('@/components/dataAnalysis/ScoreMap')
             },
             {
                 path: '/home/travelMap',
                 name: '旅游地图',
                 iconClass: 'fa fa-line-chart',
+                meta: {
+                    label: '旅游地图',
+                },
                 component: () => import('@/components/dataAnalysis/TravelMap')
             }
         ]
@@ -129,24 +171,36 @@ const routes = [
         name: '用户中心',
         path: '/users',
         iconClass: 'fa fa-user',
+        meta: {
+            label: '用户中心',
+        },
         component: ()=> import('@/components/Home'), //懒加载
         children:[
             {
                 path: '/users/getBackgroundUserList',
                 name: '用户管理',
                 iconClass: 'fa fa-user',
+                meta: {
+                    label: '用户管理',
+                },
                 component: () => import('@/components/users/BackUserList')
             },
             {
                 path: '/users/roleList',
                 name: '角色管理',
                 iconClass: 'fa fa-user',
+                meta: {
+                    label: '角色管理',
+                },
                 component: () => import('@/components/users/RoleList')
             },
             {
                 path: '/users/permission',
                 name: '权限管理',
                 iconClass: 'fa fa-user',
+                meta: {
+                    label: '权限管理',
+                },
                 component: () => import('@/components/users/Permission')
             },
         ]

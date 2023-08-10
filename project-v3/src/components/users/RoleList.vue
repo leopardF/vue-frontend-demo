@@ -25,10 +25,10 @@
                     <el-input v-model="form.roleName" autocomplete="off" id="roleName"></el-input>
                 </el-form-item>
             </el-form>
-            <RolePermission :roleId="currentRoleId" v-if="!state"/>
+            <RolePermission :roleId="currentRoleId" :memuList="memuList" :checkedList="menuCheckList" v-if="!state"/>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="closeInfo(formRef)">取 消</el-button>
+                    <el-button @click="closeInfo">取 消</el-button>
                     <el-button type="primary" @click="onSumbit(formRef)">确 定</el-button>
                 </span>
             </template>
@@ -45,7 +45,7 @@ import {
   Search,
   Star,
 } from '@element-plus/icons-vue';
-import { getTableData, addInfo,updateInfo,delData } from '@/api/table.js';
+import { getTableData, addInfo,updateInfo,delData,getDataByUrl } from '@/api/table.js';
 import {ElMessage, ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref, nextTick } from 'vue';
 import RolePermission from './RolePermission.vue';
@@ -69,10 +69,22 @@ const rules = {
 const state = ref(true);
 const getTableDataUrl = '/v1/role/getRoleList';
 const loading = ref(true);
+const memuList = ref([]);
 
 onMounted(()=>{
     getTableData(tableData, total, getTableDataUrl);
     loading.value = false;
+    getDataByUrl(`/v1/menus/getMenusListByTree`)
+    .then(res => {
+        if (res.data.code === 200) {
+            memuList.value = res.data.data;
+        } else {
+            ElMessage({ message: '查询失败', type: 'error' })
+        }
+    })
+    .catch(err => {
+        throw err
+    })
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
@@ -88,23 +100,38 @@ const handleCurrentChange = (val) => {
     loading.value = false;
 }
 
-const formRef = ref(null);
+const formRef = ref({});
 const closeInfo = (formRef) => {
     dialogFormVisible.value = false;
-    nextTick(() => {
-        formRef.value?.resetFields();
-    });
+    formRef.value?.resetFields();
 };
 const removeData = (row) => {
     delData(tableData,total, "/v1/role/removeRoleInfo", row.id, getTableData, getTableDataUrl);
     loading.value = false;
 }
 const currentRoleId = ref('');
+const menuCheckList = ref([]);
 const editData = (row) => {
     state.value = false;
-    dialogFormVisible.value = true;
     currentRoleId.value = row.id;
-    Object.assign(form, row); //写法类似拷贝行数据的副本，不然直接获取row的话，会是当前行的实时数据
+    // Object.assign(form, row); //写法类似拷贝行数据的副本，不然直接获取row的话，会是当前行的实时数据
+
+    getDataByUrl(`/v1/roleMenus/getRoleMenusList/` + row.id)
+    .then(res => {
+        if (res.data.code === 200) {
+            menuCheckList.value = [];
+            res.data.data.forEach(menuInfo => {
+                menuCheckList.value.push(menuInfo.menuId);
+            });
+            Object.assign(form, row);
+            dialogFormVisible.value = true;
+        } else {
+            ElMessage({ message: '查询失败', type: 'error' })
+        }
+    })
+    .catch(err => {
+        throw err
+    })
 
 }
 const addRole = () => {

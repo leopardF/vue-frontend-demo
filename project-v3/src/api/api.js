@@ -81,3 +81,12 @@ export function getTrabelView(){
         url:'/v1/data/getTravelViewList'
     })
 }
+
+
+//旅游数据概览的接口
+export function getTrabelView2(){
+    return service({
+        method:'get',
+        url:'/v1/data/getTravelViewList'
+    })
+}
