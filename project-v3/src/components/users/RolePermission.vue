@@ -2,13 +2,13 @@
     <div class="permission-view">
         <el-tree :data="filteredMenus" show-checkbox node-key="id" :props="defaultProps" ref="treeRef" :default-checked-keys="checkedMenus" :default-expanded-keys="checkedMenus">
         </el-tree>
-        <el-button @click="updateCheckedNodes">更新权限{{ checkedList }}</el-button>
+        <el-button @click="updateCheckedNodes">更新权限</el-button>
     </div>
 </template>
 <script setup>
 import { getCurrentInstance, defineProps,toRefs, ref ,watch,onMounted, nextTick  } from 'vue'
 import { updateInfoNotTable } from '@/api/table.js';
-const { proxy,refs } = getCurrentInstance();
+const { proxy } = getCurrentInstance();
 const props = defineProps(["roleId","memuList","checkedList"]);
 const {roleId,memuList,checkedList} = toRefs(props);
 // const emit = defineEmits()
@@ -20,9 +20,9 @@ const defaultProps = {
 
 const checkedMenus = ref([]);
 watch(checkedList, (newValue, oldValue) => {
-    console.log("refs.treeRef",refs.treeRef)    //跳转进入watch 拿不到  undefined，
+    proxy.$refs?.treeRef?.setCheckedKeys([]);
+    // console.log("refs.treeRef", proxy.$refs.treeRef)    //跳转进入watch 拿不到  undefined，
     checkedMenus.value = [...newValue];
-    console.log("checkedMenus",checkedMenus.value);
 }, { immediate: true, deep: true });
 
 
@@ -41,7 +41,7 @@ const packageMenus = (data, menuData) => {
             meta: {
                 label: item.menuName,
             },
-            hidden: item.hidden === undefined ? false : item.hidden,
+            hidden: item.isHidden === undefined ? false : item.isHidden,
             component: ()=> import('@/components' + item.pageUrl), //懒加载
             children: childrenTemp
         })
@@ -68,7 +68,7 @@ const filteredMenus = filterHiddenRoutes(menus);
 // console.log("filteredMenus", filteredMenus)
 
 const updateCheckedNodes = () => {
-    let checkedList = refs.treeRef.getCheckedNodes();
+    let checkedList =  proxy.$refs.treeRef.getCheckedNodes();
     console.log(checkedList);
     let idList = [];
     checkedList.forEach((node) => {

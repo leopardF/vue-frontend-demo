@@ -74,8 +74,8 @@
         <div class="dialog-footer">
             <span>
                 <el-button @click="backPage">返 回</el-button>
-                <el-button type="primary" @click="onAddSumbit(formRef)" v-if="state">新 增</el-button>
-                <el-button type="primary" @click="onEditSumbit(formRef)" v-if="!state">更 新</el-button>
+                <el-button type="primary" @click="onSumbit()" v-if="state">新 增</el-button>
+                <el-button type="primary" @click="onSumbit()" v-if="!state">更 新</el-button>
             </span>
         </div>
     </div>
@@ -83,7 +83,7 @@
 <script setup>
 import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue';
 import { onMounted, reactive, ref } from 'vue';
-import { postDataByUrl,getDataByUrl } from '@/api/table.js';
+import { addArticleInfo, updateArticleInfo, getArticleInfoDetail } from '@/api/articles/articles.js'
 import { useRouter,useRoute } from 'vue-router';
 import { ElMessage } from "element-plus";
 const route = useRoute();
@@ -123,7 +123,7 @@ onMounted(() => {
     }
     console.log(temp , !temp)
     if(!temp){
-        getDataByUrl("/v1/articleInfo/getArticleInfo/"+articleInfoId)
+        getArticleInfoDetail(articleInfoId)
         .then(res => {
             if (res.data.code === 200) {
                 if(res.data.data === null || res.data.data === undefined){
@@ -209,36 +209,31 @@ const handleUploadError = (err, file) => {
     ElMessage.error('上传失败，请重试')
 }
 //提交
-const onAddSumbit = () => {
-    postDataByUrl("/v1/articleInfo/addArticleInfoInfo", form)
-        .then(res => {
-            if (res.data.code === 200) {
-                ElMessage({ message: '新增成功', type: 'success' })
-                router.push({ path: "/home/articleList" })
-            } else {
-                ElMessage({ message: '新增失败', type: 'error' })
-            }
-        })
-        .catch(err => {
-            ElMessage({ message: '处理异常', type: 'error' })
-            throw err
-        })
+const formRef = ref({});
+const onSumbit = () => {
+    formRef.validate(vaild => {
+        if (vaild) {
+            const methodChange = state.value ? addArticleInfo(form) : updateArticleInfo(form);
+            methodChange.then(res => {
+                if (res.data.code === 200) {
+                    ElMessage({ message: state.value ? '新增成功' : '编辑成功', type: 'success' })
+                    backPage()
+                } else {
+                    ElMessage({ message: state.value ? '新增失败' : '编辑失败', type: 'error' })
+                }
+            }) 
+            .catch(err => {
+                ElMessage({ message: '处理异常', type: 'error' })
+                throw err
+            })
+        } else {
+            // 验证不通过，显示错误信息
+            ElMessage({ message: '表单数据验证失败', type: 'error' });
+        }
+    })
+
 }
-const onEditSumbit = () => {
-    postDataByUrl("/v1/articleInfo/editArticleInfoInfo", form)
-        .then(res => {
-            if (res.data.code === 200) {
-                ElMessage({ message: '编辑成功', type: 'success' })
-                router.push({ path: "/home/articleList" })
-            } else {
-                ElMessage({ message: '编辑失败', type: 'error' })
-            }
-        })
-        .catch(err => {
-            ElMessage({ message: '处理异常', type: 'error' })
-            throw err
-        })
-}
+
 //返回
 const backPage = () => {
     router.push({ path: "/home/articleList" })

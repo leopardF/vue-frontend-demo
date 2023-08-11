@@ -87,7 +87,7 @@ import {
   Search,
   Star,
 } from '@element-plus/icons-vue'
-import { getStudentList, removeStudent, addStudentInfo, updateStudent } from '@/api/api.js'
+import { getStudentList, removeStudent, addStudentInfo, updateStudent } from '@/api/students/infoList.js'
 import {ElMessage, ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref, nextTick} from 'vue'
 const tableData = ref([]);
@@ -131,6 +131,8 @@ const getData = (params) => {
             if (res.data.code === 200) {
                 tableData.value = res.data.data.dataList
                 total.value = res.data.data.total
+            }else{
+                ElMessage({ message: '查询失败', type: 'error' })
             }
         })
 }
@@ -166,9 +168,10 @@ const removeData = (row) => {
     .then(() => {
         removeStudent({ id: row.id })
         .then(res => {
-            console.log(res)
             if (res.data.code === 200 && res.data.data === true) {
                 ElMessage({ message: '删除成功', type: 'success' })
+            }else{
+                ElMessage({ message: '删除失败', type: 'error' })
             }
         })
     })
@@ -185,9 +188,8 @@ const editData = (row) => {
 const addStudent = () => {
     state.value = true;
     dialogFormVisible.value = true;
-    nextTick(() => {
-        formRef.value?.resetFields();
-    });
+    formRef.value?.resetFields();
+    Object.assign(form, initForm);
 }
 
 const onSumbit = (formRef) => {
@@ -197,7 +199,6 @@ const onSumbit = (formRef) => {
             if (state.value) {
                 addStudentInfo(form)
                     .then(res => {
-                        // console.log(res)
                         if (res.data.code === 200) {
                             ElMessage({ message: '新增成功', type: 'success' })
                         } else {
@@ -207,7 +208,6 @@ const onSumbit = (formRef) => {
             } else {
                 updateStudent(form)
                     .then(res => {
-                        // console.log(res)
                         if (res.data.code === 200) {
                             ElMessage({ message: '修改成功', type: 'success' })
                         } else {

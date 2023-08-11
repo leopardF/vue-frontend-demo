@@ -137,9 +137,7 @@ const editData = (row) => {
 const addRole = () => {
     state.value = true;
     dialogFormVisible.value = true;
-    nextTick(() => {
-        formRef.value?.resetFields();
-    });
+    Object.assign(form, initForm);
 }
 
 const onSumbit = (formRef) => {

@@ -23,9 +23,11 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import defaultRouter from "@/router/defaultRouter.js"
 const router = useRouter()
 const menus = router.options.routes
 const activePath = [router.currentRoute.value.path]
+console.log("activePath",activePath)
 
 const filteredChildren = (children) => {
   return children.filter(child => !child.hidden);

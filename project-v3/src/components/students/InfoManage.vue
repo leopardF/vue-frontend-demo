@@ -84,9 +84,9 @@
 </template>
 <script setup>
 import {  Check, Delete, Edit, Message, Search, Star } from '@element-plus/icons-vue';
-import { getData, changeInfo,delData } from '@/api/table.js';
+import { getStudentList, removeStudent, addStudentInfo, updateStudent } from '@/api/students/infoList.js'
 import {ElMessage, ElMessageBox} from "element-plus";
-import { onMounted, reactive, ref, nextTick, getCurrentInstance} from 'vue';
+import { onMounted, reactive, ref, nextTick} from 'vue';
 const tableData = ref([]);
 const pageStart = ref(1);
 const pageSize = ref(10);
@@ -120,25 +120,35 @@ const rules = {
     phone: [{ required: true, message: '请输入联系方式' }]
 };
 const state = ref(true);
-const getDataUrl = '/v1/student/getStudentList';
-const { proxy } = getCurrentInstance();
 
+const getData = (params) => {
+    getStudentList(params)
+        .then(res => {
+            // console.log(res)
+            if (res.data.code === 200) {
+                tableData.value = res.data.data.dataList
+                total.value = res.data.data.total
+            }else{
+                ElMessage({ message: '查询失败', type: 'error' })
+            }
+        })
+}
 onMounted(()=> {
-    getData(tableData,total, getDataUrl)
+    getData()
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    getData(tableData,total, getDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
 }
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    getData(tableData,total, getDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
 }
 
-const formRef = ref(null);
+const formRef = ref({});
 const closeInfo = (formRef) => {
     dialogFormVisible.value = false;
     nextTick(() => {
@@ -146,7 +156,24 @@ const closeInfo = (formRef) => {
     });
 }
 const removeData = (row) => {
-    delData(tableData, total, '/v1/student/removeStudentInfo', row.id, getData, getDataUrl)
+    ElMessageBox.confirm('确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '关闭',
+        type: 'warning',
+    })
+    .then(() => {
+        removeStudent({ id: row.id })
+        .then(res => {
+            if (res.data.code === 200 && res.data.data === true) {
+                ElMessage({ message: '删除成功', type: 'success' })
+            }else{
+                ElMessage({ message: '删除失败', type: 'error' })
+            }
+        })
+    })
+    .catch(() => {
+        ElMessage({ message: '已取消', type: 'success' })
+    })
 }
 const editData = (row) => {
     state.value = false;
@@ -158,18 +185,27 @@ const editData = (row) => {
 const addStudent = () => {
     state.value = true;
     dialogFormVisible.value = true;
-    nextTick(() => {
-        formRef.value?.resetFields();
-        Object.assign(form, intiForm);
-    });
+    formRef.value?.resetFields();
+    Object.assign(form, intiForm);
 }
 const onSumbit = (formRef) => {
     // console.log(form, this.form);
     formRef.validate(vaild => {
         if (vaild) {
-            let methodUrl = state.value ? '/v1/student/addStudentInfo' : '/v1/student/editStudentInfo';
-            changeInfo(tableData, total, dialogFormVisible, pageStart, methodUrl, form, getData,getDataUrl);
-            // this.$refs[form].resetFields();
+            const methodChange = state.value ? addStudentInfo(form) : updateStudent(form);
+            methodChange.then(res => {
+                if (res.data.code === 200) {
+                    ElMessage({ message: state.value ? '新增成功' : '编辑成功', type: 'success' })
+                } else {
+                    ElMessage({ message: state.value ? '新增失败' : '编辑失败', type: 'error' })
+                }
+            })
+            dialogFormVisible.value = false;
+            pageStart.value = 1;
+            getData();
+        } else {
+            // 验证不通过，显示错误信息
+            ElMessage({ message: '表单数据验证失败', type: 'error' });
         }
     })
 }

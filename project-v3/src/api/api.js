@@ -11,82 +11,26 @@ export function login(data){
     })
 }
 
+
+//获取权限列表
+export function getMenusListByUserId(userId){
+    return service({
+        method:'get',
+        url: `/v1/menus/getMenusListByUserId/` + userId
+    })
+}
+
+
+//==========================================================================
+export function postWay(url, data){
+    return service.post(url,data)
+}
+
 //学生列表查询接口
-export function getStudentList(param){
+export function getWay(url, param){
     return service({
         method:'get',
-        url:'/v1/student/getStudentList',
+        url:url,
         params:param
-    })
-}
-
-//删除学生信息接口
-export function removeStudent(data){
-    return service({
-        method:'post',
-        url:'/v1/student/removeStudentInfo',
-        data:data
-    })
-}
-
-//删除学生信息接口
-// export function removeStudent(id){
-//     return service({
-//         method:'post',
-//         url:'/v1/student/removeStudentInfo/${id}'
-//     })
-// }
-
-//修改学生信息接口
-export function updateStudent(data){
-    return service({
-        method:'post',
-        url:'/v1/student/editStudentInfo',
-        data:data
-    })
-}
-
-//新增学生信息接口
-export function addStudentInfo(data){
-    return service({
-        method:'post',
-        url:'/v1/student/addStudentInfo',
-        data:data
-    })
-}
-
-//新增和修改共用
-// export function addAndUpdateStudentInfo(type, data){
-//     // qs.stringify()  可以让数据 {'a':'1','b':'2'} => a=1&b=2   ,不过现在用json格式，不需要转化
-//     let obj = {
-//         method:type,    //新增用 post，新增 put
-//         url:'/v1/student/addAndUpdateStudentInfo',
-//         data:data
-//     }
-//     return service(obj)
-// }
-
-//数据概览的接口
-export function getDataView(){
-    return service({
-        method:'get',
-        url:'/v1/data/getDataViewList'
-    })
-}
-
-//旅游数据概览的接口
-export function getTrabelView(){
-    return service({
-        method:'get',
-        url:'/v1/data/getTravelViewList'
-    })
-}
-
-
-//旅游数据概览的接口
-export function getTrabelView2(){
-    return service({
-        method:'get',
-        url:'/v1/data/getTravelViewList'
     })
 }

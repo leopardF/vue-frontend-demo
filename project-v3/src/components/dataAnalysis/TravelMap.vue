@@ -5,16 +5,19 @@
 </template>
 <script setup>
 import geoJson from '@/assets/mapdata.json'
-import { getTrabelView } from "@/api/api"
+import { getTrabelView } from "@/api/dataAnalysis/dataAnalysis.js"
 import map from '@/utils/map.js'
 import * as echarts from 'echarts'
 import { onMounted } from 'vue'
+import { ElMessage } from 'element-plus';
 onMounted(()=>{
     getTrabelView()
     .then(res => {
         if (res.data.code === 200) {
             let { points, linesData } = res.data.data;
             draw(points, linesData)
+        } else {
+            ElMessage({ message: '查询失败', type: 'error' })
         }
     })
     .catch(err => {

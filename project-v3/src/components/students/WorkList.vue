@@ -34,7 +34,7 @@
 </template>
 <script setup>
 
-import {getTableData } from '@/api/table'
+import { getHomeWorkList } from '@/api/students/workList.js'
 import { reactive,ref, onMounted } from 'vue';
 const tableData = ref([]);
 const pageStart = ref(1);
@@ -43,37 +43,43 @@ const total = ref(0);
 const formInline = reactive({
     title: ''
 });
-const getTableDataUrl = '/v1/homework/getHomeworkList';
 const loading = ref(true);
+const getData = (params) => {
+    
+    loading.value = true;
+    getHomeWorkList(params)
+        .then(res => {
+            // console.log(res)
+            if (res.data.code === 200) {
+                tableData.value = res.data.data.dataList
+                total.value = res.data.data.total
+            }else{
+                ElMessage({ message: '查询失败', type: 'error' })
+            }
+        })
+    loading.value = false;
+}
 onMounted(() => {
-    getTableData(tableData, total, getTableDataUrl)
+    getData();
     loading.value = false;
 })
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    loading.value = true;
-    getTableData(tableData, total, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
-    loading.value = false;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
 }
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    loading.value = true;
-    getTableData(tableData, total, getTableDataUrl,{ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
-    loading.value = false;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
 }
 const findHomeword = () => {
-    loading.value = true;
-    getTableData(tableData, total, getTableDataUrl, formInline);
-    loading.value = false;
+    getData(formInline);
 }
 const resetCondition = () => {
     formInline.title = '';
-    loading.value = true;
-    getTableData(tableData, total,loading, getTableDataUrl,formInline);
-    loading.value = false;
+    getData(formInline);
 }
 const completedText = (row, cloumn) => {
     return row.completed ? '是' : '否';

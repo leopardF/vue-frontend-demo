@@ -45,15 +45,8 @@
     </div>
 </template>
 <script setup>
-import {
-  Check,
-  Delete,
-  Edit,
-  Message,
-  Search,
-  Star,
-} from '@element-plus/icons-vue'
-import { getStudentList, removeStudent } from '@/api/api.js'
+import { Check, Delete, Edit, Message, Search, Star,} from '@element-plus/icons-vue'
+import { getStudentList, removeStudent } from '@/api/students/infoList.js'
 import { onMounted, reactive, ref} from 'vue'
 import {ElMessage} from "element-plus";
 
@@ -97,6 +90,7 @@ const removeData = (row) => {
             console.log(res)
             if (res.data.code === 200 && res.data.data === true) {
                 ElMessage({ message: '删除成功', type: 'success' });
+                getData();
             }
         })
 }

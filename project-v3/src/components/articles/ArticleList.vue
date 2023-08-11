@@ -34,11 +34,9 @@
     </div>
 </template>
 <script setup>
-import {
-  Check,Delete,Edit,Message,Search,Star,
-} from '@element-plus/icons-vue'
-import { getTableData, addInfo,updateInfo,delData,getDataByUrl } from '@/api/table.js'
-import {ElMessage} from "element-plus";
+import { Check,Delete,Edit,Message,Search,Star,} from '@element-plus/icons-vue'
+import { getArticleInfoList, removeArticleInfo } from '@/api/articles/articles.js'
+import {ElMessage,ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref} from 'vue'
 import { useRouter } from 'vue-router'
 import { formatDate } from '@/utils/format.js'
@@ -50,7 +48,6 @@ const total = ref(0);
 const formInline = reactive({
     searchName: ''
 });
-const getTableDataUrl = '/v1/articleInfo/getArticleInfoList';
 const loading = ref(true);
 
 const state = ref(true);
@@ -61,26 +58,56 @@ const initForm = {
 };
 const form = reactive({...initForm});
 
+const getData = (params) => {
+    loading.value = true;
+    getArticleInfoList(params)
+        .then(res => {
+            // console.log(res)
+            if (res.data.code === 200) {
+                tableData.value = res.data.data.dataList
+                total.value = res.data.data.total
+            }else{
+                ElMessage({ message: '查询失败', type: 'error' })
+            }
+        })
+    loading.value = false;
+}
 
 onMounted(()=>{
-    getTableData(tableData, total, getTableDataUrl);
+    getData();
     loading.value = false;
 });
 const handleSizeChange = (val) => {
     // console.log(`每页 ${val} 条`);
     pageSize.value = val;
     pageStart.value = 1;
-    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, formInline });
-    loading.value = false;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value, formInline });
 };
 const handleCurrentChange = (val) => {
     // console.log(`当前页: ${val}`);
     pageStart.value = val;
-    getTableData(tableData, total, getTableDataUrl, { pageSize: pageSize.value, pageStart: pageStart.value, formInline });
-    loading.value = false;
+    getData({ pageSize: pageSize.value, pageStart: pageStart.value, formInline });
 };
 const removeData = (row) => {
-    delData(tableData,total, "/v1/articleInfo/removeArticleInfoInfo", row.id, getTableData, getTableDataUrl)
+    ElMessageBox.confirm('确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '关闭',
+        type: 'warning',
+    })
+    .then(() => {
+        removeArticleInfo({ id: row.id })
+        .then(res => {
+            if (res.data.code === 200 && res.data.data === true) {
+                ElMessage({ message: '删除成功', type: 'success' })
+                getData();
+            }else{
+                ElMessage({ message: '删除失败', type: 'error' })
+            }
+        })
+    })
+    .catch(() => {
+        ElMessage({ message: '已取消', type: 'success' })
+    })
 };
 const addArticleInfo = () => {
     state.value = true;
@@ -90,7 +117,6 @@ const addArticleInfo = () => {
 
 const editData = (row) => {
     state.value = false;
-    // Object.assign(form, row);
     console.log("state" , state.value)
     router.push({path:"/home/articleDetail", query: { articleInfoId: row.id , state: state.value } })
 }
@@ -103,9 +129,7 @@ const formatDateText = (row, column) => {
 };
 
 const search = () => {
-    loading.value = true;
-    getTableData(tableData, total, getTableDataUrl, formInline);
-    loading.value = false;
+    getData(formInline);
 }
 
 </script>
