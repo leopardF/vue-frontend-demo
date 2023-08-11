@@ -1,14 +1,14 @@
 <template>
     <div class="permission-view">
-        <el-tree :data="filteredMenus" show-checkbox node-key="id" :props="defaultProps" ref="tree">
+        <el-tree :data="filteredMenus" show-checkbox node-key="id" :props="defaultProps" ref="treeRef" :default-checked-keys="checkedMenus" :default-expanded-keys="checkedMenus">
         </el-tree>
-        <el-button @click="updateCheckedNodes">更新权限</el-button>
+        <el-button @click="updateCheckedNodes">更新权限{{ checkedList }}</el-button>
     </div>
 </template>
 <script setup>
-import { getCurrentInstance, defineProps,toRefs } from 'vue'
+import { getCurrentInstance, defineProps,toRefs, ref ,watch,onMounted, nextTick  } from 'vue'
 import { updateInfoNotTable } from '@/api/table.js';
-const { proxy } = getCurrentInstance();
+const { proxy,refs } = getCurrentInstance();
 const props = defineProps(["roleId","memuList","checkedList"]);
 const {roleId,memuList,checkedList} = toRefs(props);
 // const emit = defineEmits()
@@ -17,15 +17,24 @@ const defaultProps = {
     children: 'children'
 };
 
+
+const checkedMenus = ref([]);
+watch(checkedList, (newValue, oldValue) => {
+    console.log("refs.treeRef",refs.treeRef)    //跳转进入watch 拿不到  undefined，
+    checkedMenus.value = [...newValue];
+    console.log("checkedMenus",checkedMenus.value);
+}, { immediate: true, deep: true });
+
+
 // const menus = [...proxy.$router.options.routes];
 const packageMenus = (data, menuData) => {
-    console.log("111",data , menuData); 
     data.forEach(item => {
         const childrenTemp = [];
         if(item.childrenList && item.childrenList.length > 0){
             packageMenus(item.childrenList,childrenTemp)
         }
         menuData.push({
+            id: item.id,
             name: item.menuName,
             path: item.menuUrl,
             iconClass: item.iconClazz,
@@ -56,17 +65,16 @@ const filterHiddenSubRoutes = (routes) => {
   }).filter(route => route !== null);
 }
 const filteredMenus = filterHiddenRoutes(menus);
-console.log(menus);
+// console.log("filteredMenus", filteredMenus)
 
 const updateCheckedNodes = () => {
-    let checkedList = proxy.$refs.tree.getCheckedNodes();
+    let checkedList = refs.treeRef.getCheckedNodes();
     console.log(checkedList);
     let idList = [];
     checkedList.forEach((node) => {
-        idList.push(node.path)
+        idList.push(node.id)
     });
-    console.log("perPage ",idList);
-    updateInfoNotTable("/v1/roleMenus/updateRoleMenus", {"roleId":roleId , "menusIdList": idList});
+    updateInfoNotTable("/v1/roleMenus/updateRoleMenus", {"roleId":roleId.value , "menusIdList": idList});
 
 }
 

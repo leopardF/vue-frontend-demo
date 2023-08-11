@@ -46,7 +46,7 @@ import {
   Star,
 } from '@element-plus/icons-vue';
 import { getTableData, addInfo,updateInfo,delData,getDataByUrl } from '@/api/table.js';
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage} from "element-plus";
 import { onMounted, reactive, ref, nextTick } from 'vue';
 import RolePermission from './RolePermission.vue';
 
