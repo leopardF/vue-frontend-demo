@@ -6,8 +6,9 @@
     </div>
 </template>
 <script setup>
-import { getCurrentInstance, defineProps,toRefs, ref ,watch,onMounted, nextTick  } from 'vue'
-import { updateInfoNotTable } from '@/api/table.js';
+import { getCurrentInstance, defineProps,toRefs, ref ,watch  } from 'vue'
+import {ElMessage} from "element-plus";
+import { updateRoleMenus } from '@/api/users/rolePermission.js';
 const { proxy } = getCurrentInstance();
 const props = defineProps(["roleId","memuList","checkedList"]);
 const {roleId,memuList,checkedList} = toRefs(props);
@@ -74,7 +75,17 @@ const updateCheckedNodes = () => {
     checkedList.forEach((node) => {
         idList.push(node.id)
     });
-    updateInfoNotTable("/v1/roleMenus/updateRoleMenus", {"roleId":roleId.value , "menusIdList": idList});
+    updateRoleMenus({"roleId":roleId.value , "menusIdList": idList})
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage({ message: '更新成功', type: 'success' })
+            } else {
+                ElMessage({ message: '更新失败', type: 'error' })
+            }
+        })
+        .catch(err => {
+            throw err
+        })
 
 }
 

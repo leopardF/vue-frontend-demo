@@ -3,32 +3,7 @@ import qs from 'qs';
 import {ElMessage, ElMessageBox} from "element-plus";
 
 
-//获取对象数据
-export function getDataByUrl(url) {
-    return service.get(url)
-}
-
-export function postDataByUrl(url,form) {
-    return service.post(url, form)
-}
-
-//获取表格数据
-export function getData(tableData, total, url, params) {
-    service.get(url, { params: params || {} })
-        .then(res => {
-            if (res.data.code === 200) {
-                tableData.value = res.data.data.dataList
-                total.value = res.data.data.total
-            } else {
-                ElMessage({ message: '查询失败', type: 'error' })
-            }
-        })
-        .catch(err => {
-            throw err
-        })
-}
-
-// 新增和修改方法的封装
+// 新增和修改方法的封装(Qt在使用)
 
 export function addInfo(tableData, total,dialogFormVisible, pageStart, url, form, callback, callbackUrl) {
     // let data = qs.stringify(form);
@@ -48,21 +23,8 @@ export function addInfo(tableData, total,dialogFormVisible, pageStart, url, form
         })
 }
 
-export function updateInfoNotTable(url, form) {
-    // let data = qs.stringify(form);
-    service.post(url, form)
-        .then(res => {
-            if (res.data.code === 200) {
-                ElMessage({ message: '更新成功', type: 'success' })
-            } else {
-                ElMessage({ message: '更新失败', type: 'error' })
-            }
-        })
-        .catch(err => {
-            throw err
-        })
-}
 
+//(Qt在使用)
 export function updateInfo(tableData, total,dialogFormVisible, url, form, callback, callbackUrl) {
     // let data = qs.stringify(form);
     service.post(url, form)
@@ -79,43 +41,9 @@ export function updateInfo(tableData, total,dialogFormVisible, url, form, callba
             throw err
         })
 }
-export function changeInfo(tableData, total,dialogFormVisible, pageStart, url, form, callback, callbackUrl) {
-    // let data = qs.stringify(form);
-    service.post(url, form)
-        .then(res => {
-            if (res.data.code === 200) {
-                ElMessage({ message: '操作成功', type: 'success' })
-            } else {
-                ElMessage({ message: '操作失败', type: 'error' })
-            }
-            dialogFormVisible.value = false;
-            pageStart.value = 1;
-            callback(tableData,total, callbackUrl);
-        })
-        .catch(err => {
-            throw err
-        })
-}
-// export function changeInfo(root,method, url, form, callback) {
-//     let data = qs.stringify(form);
-//     root.service[method](url, data)
-//         .then(res => {
-//             if (res.data.code === 200) {
-//                 root.$message({ message: '新增成功', type: 'success' })
-//             } else {
-//                 root.$message({ message: '新增失败', type: 'error' })
-//             }
-//             root.dialogFormVisible = false;
-//             root.pageStart = 1;
-//             callback(root,url);
-//             root.$refs[form].resetFields();
-//         })
-//         .catch(err => {
-//             throw err
-//         })
-// }
 
-//删除方法封装
+
+//删除方法封装(Qt在使用)
 export function delData(tableData,total, url, id, callback, callbackUrl) {
 
     ElMessageBox.confirm('确定要删除吗？', '提示', {
@@ -143,7 +71,7 @@ export function delData(tableData,total, url, id, callback, callbackUrl) {
 
 // ============================================================
 
-//作业列表获取表格数据方法
+//作业列表获取表格数据方法(Qt在使用)
 export function getTableData(tableData, total, url, params){
     service.get(url, {params:params || {}})
     .then(res => {

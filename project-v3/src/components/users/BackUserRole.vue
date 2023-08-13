@@ -21,7 +21,8 @@
 
 <script setup>
 import { computed, ref,defineProps,watch,toRefs } from "vue";
-import { updateInfoNotTable } from '@/api/table.js';
+import {ElMessage} from "element-plus";
+import { updateBackUserRole } from '@/api/users/backUserRole.js';
 
 const props = defineProps(["userId","roles","checkedList"]);
 const {userId,roles,checkedList} = toRefs(props);
@@ -50,7 +51,17 @@ const handleCheckedRoleChange = (value) => {
 const updateCheckedNodes = () => {
     let idList = checkedRoles.value;
     console.log("perPage idList",idList);
-    updateInfoNotTable("/v1/backUserRole/updateBackUserRole", {"backgroundUserId":userId.value , "roleIdList": idList});
+    updateBackUserRole({"backgroundUserId":userId.value , "roleIdList": idList})
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage({ message: '更新成功', type: 'success' })
+            } else {
+                ElMessage({ message: '更新失败', type: 'error' })
+            }
+        })
+        .catch(err => {
+            throw err
+        })
 }
 
 </script>

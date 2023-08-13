@@ -1,37 +1,66 @@
 import service from "@/service";
 
-//学生列表查询接口
-export function getStudentList(param){
+
+//修改角色权限信息接口
+export function updateRoleMenus(data){
+    return service({
+        method:'post',
+        url:'/v1/roleMenus/updateRoleMenus',
+        data:data
+    })
+}
+
+//角色列表查询接口
+export function getRoleList(param){
     return service({
         method:'get',
-        url:'/v1/student/getStudentList',
+        url:'/v1/role/getRoleList',
         params:param
     })
 }
 
-//删除学生信息接口
-export function removeStudent(data){
+//菜单树型列表查询接口
+export function getMenusListByTree(param){
+    return service({
+        method:'get',
+        url:'/v1/menus/getMenusListByTree',
+        params:param
+    })
+}
+
+
+//删除角色信息接口
+export function removeRoleInfo(data){
     return service({
         method:'post',
-        url:'/v1/student/removeStudentInfo',
+        url:'/v1/role/removeRoleInfo',
         data:data
     })
 }
 
-//修改学生信息接口
-export function updateStudent(data){
+//角色所拥菜单树型列表查询接口
+export function getRoleMenusList(roleId){
+    return service({
+        method:'get',
+        url:`/v1/roleMenus/getRoleMenusList/` + roleId
+    })
+}
+
+
+//新增角色信息接口
+export function addRoleInfo(data){
     return service({
         method:'post',
-        url:'/v1/student/editStudentInfo',
+        url:'/v1/role/addRoleInfo',
         data:data
     })
 }
 
-//新增学生信息接口
-export function addStudentInfo(data){
+//修改角色权限信息接口
+export function updateRoleInfo(data){
     return service({
         method:'post',
-        url:'/v1/student/addStudentInfo',
+        url:'/v1/role/updateRoleInfo',
         data:data
     })
 }

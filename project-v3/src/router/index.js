@@ -10,6 +10,7 @@ const routes = [{
     meta: {
         label: '首页',
     },
+    redirect: '/home/studentList',
     component: () => import('@/components/Admin')
 },
 {

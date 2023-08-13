@@ -4,7 +4,7 @@
             <div class="title">通用后台管理系统</div>
             <div>
                 <i class="fa fa-user"></i>{{ name }}
-                <i class="fa fa-sign-out">退出</i>
+                <i class="fa fa-sign-out" style="margin-right:0 5px"></i>
             </div>
         </el-header>
     </div>

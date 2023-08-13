@@ -13,7 +13,7 @@ export function getArticleInfoList(param){
 export function getArticleInfoDetail(id){
     return service({
         method:'get',
-        url:'/v1/articleInfo/getArticleInfoList/' + id
+        url:'/v1/articleInfo/getArticleInfo/' + id
     })
 }
 
