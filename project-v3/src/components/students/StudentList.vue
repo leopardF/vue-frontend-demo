@@ -2,7 +2,7 @@
     <div class="studentList">
         <el-form :inline="true" :model="formInline" class="demo-form-inline" size="small">
             <el-form-item label="姓名">
-                <el-input v-model="formInline.name" placeholder="请输入姓名查询"></el-input>
+                <el-input v-model="formInline.searchName" placeholder="请输入姓名查询"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="findStudent">查询</el-button>
@@ -38,10 +38,7 @@
             </el-table-column>
         </el-table>
 
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
-            :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-        </el-pagination>
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
     </div>
 </template>
 <script setup>
@@ -49,13 +46,13 @@ import { Check, Delete, Edit, Message, Search, Star,} from '@element-plus/icons-
 import { getStudentList, removeStudent } from '@/api/students/infoList.js'
 import { onMounted, reactive, ref} from 'vue'
 import {ElMessage} from "element-plus";
+import Pageing from '../common/Pageing.vue'
 
 let tableData = ref([]);
 let pageStart = ref(1);
-let pageSize = ref(10);
 let total = ref(0);
 let formInline = reactive({
-    name: ''
+    searchName: ''
 })
 const getData = (params) => {
     getStudentList(params)
@@ -70,18 +67,6 @@ const getData = (params) => {
 onMounted(() => {
     getData()
 })
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value,name:formInline.name});
-}
-
-const handleCurrentChange = (val) => {
-    // console.log(`current page: ${val}`)
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value,name:formInline.name });
-}
 
 const removeData = (row) => {
     console.log(row.id)
@@ -98,7 +83,7 @@ const findStudent = () => {
     getData(formInline);
 }
 const resetCondition = () => {
-    formInline.name = '';
+    formInline.searchName = '';
     getData(formInline);
 }
 const sexText = (row, cloumn) => {

@@ -18,10 +18,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
-            :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-        </el-pagination>
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
 
         <el-dialog :title="state ? '添加后台用户信息' : '修改后台用户信息'" v-model="dialogFormVisible" width="500px">
             <el-form :model="form" :rules="rules" ref="formRef">
@@ -47,22 +44,15 @@
 </template>
 
 <script setup>
-import {
-  Check,
-  Delete,
-  Edit,
-  Message,
-  Search,
-  Star,
-} from '@element-plus/icons-vue'
+import { Check, Delete, Edit, Message, Search, Star,} from '@element-plus/icons-vue'
 import { getBackUserList, getRoleList,removeBackUser,getUserRoleList,addBackUserInfo,updateBackUserInfo } from '@/api/users/backUserRole.js';
 import { onMounted, reactive, ref} from 'vue'
 import {ElMessage,ElMessageBox} from "element-plus";
 import { loginNameRule,userNameRule,telephoneRule } from '@/utils/vaildate.js'
 import BackUserRole from './BackUserRole.vue';
+import Pageing from '../common/Pageing.vue'
 const tableData = ref([]);
 const pageStart = ref(1);
-const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
     searchName: ''
@@ -121,17 +111,6 @@ onMounted(()=>{
     getRoleData();
 });
 
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-};
-const handleCurrentChange = (val) => {
-    // console.log(`当前页: ${val}`);
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-};
 const formRef = ref({});
 const closeInfo = () => {
     dialogFormVisible.value = false;

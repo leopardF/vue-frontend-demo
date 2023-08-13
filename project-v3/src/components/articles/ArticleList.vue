@@ -6,6 +6,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="search">查询</el-button>
+                <el-button type="primary" @click="resetCondition">重置</el-button>
                 <el-button type="primary" @click="addArticleInfo">新增</el-button>
             </el-form-item>
         </el-form>
@@ -27,10 +28,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
-            :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-        </el-pagination>
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
     </div>
 </template>
 <script setup>
@@ -40,10 +38,10 @@ import {ElMessage,ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref} from 'vue'
 import { useRouter } from 'vue-router'
 import { formatDate } from '@/utils/format.js'
+import Pageing from '../common/Pageing.vue'
 const router = useRouter();
 const tableData = ref([]);
 const pageStart = ref(1);
-const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
     searchName: ''
@@ -77,17 +75,7 @@ onMounted(()=>{
     getData();
     loading.value = false;
 });
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, formInline });
-};
-const handleCurrentChange = (val) => {
-    // console.log(`当前页: ${val}`);
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, formInline });
-};
+
 const removeData = (row) => {
     ElMessageBox.confirm('确定要删除吗？', '提示', {
         confirmButtonText: '确定',
@@ -129,6 +117,11 @@ const formatDateText = (row, column) => {
 };
 
 const search = () => {
+    getData(formInline);
+}
+
+const resetCondition = () => {
+    formInline.searchName = '';
     getData(formInline);
 }
 

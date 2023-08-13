@@ -11,29 +11,40 @@
             <el-table-column prop="completed" label="完成情况" align="center" :formatter="completedText">
             </el-table-column>
         </el-table>
-        <Pageing :tableData="tableData" :total="total" :url="getTableDataUrl" :loading="loading"/>
+        <Pageing :total="total" @getData="getData"/>
     </div>
 </template>
-<script>
+<script setup>
 import Pageing from '../common/Pageing.vue'
-export default {
-    data() {
-        return {
-            tableData: [],
-            total: 0,
-            getTableDataUrl: '/v1/homework/getHomeworkList',
-            loading: true
-        }
-    },
-    methods: {
-        completedText(row, cloumn) {
-            return row.completed ? '是' : '否';
-        }
-    },
-    components: {
-        Pageing
-    }
+import { getHomeWorkList } from '@/api/students/workList.js'
+import { ref, onMounted } from 'vue';
+const tableData = ref([]);
+const total = ref(0);
+const loading = ref(true);
+
+const getData = (params) => {
+    loading.value = true;
+    getHomeWorkList(params)
+        .then(res => {
+            // console.log(res)
+            if (res.data.code === 200) {
+                tableData.value = res.data.data.dataList
+                total.value = res.data.data.total
+            }else{
+                ElMessage({ message: '查询失败', type: 'error' })
+            }
+        })
+    loading.value = false;
 }
+onMounted(() => {
+    getData();
+    loading.value = false;
+})
+
+const completedText = (row, cloumn) => {
+    return row.completed ? '是' : '否';
+}
+
 </script>
 
 <style lang="scss" scoped>

@@ -33,10 +33,7 @@
                 </template> -->
             </el-table-column>
         </el-table>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
-            :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-        </el-pagination>
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
         <el-dialog :title="state ? '添加學生信息' : '修改学生信息'" v-model="dialogFormVisible" width="500px">
             <el-form :model="form" :rules="rules" ref="formRef">
                 <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
@@ -87,12 +84,12 @@ import {  Check, Delete, Edit, Message, Search, Star } from '@element-plus/icons
 import { getStudentList, removeStudent, addStudentInfo, updateStudent } from '@/api/students/infoList.js'
 import {ElMessage, ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref, nextTick} from 'vue';
+import Pageing from '../common/Pageing.vue'
 const tableData = ref([]);
 const pageStart = ref(1);
-const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
-    name: ''
+    searchName: ''
 });
 const dialogFormVisible = ref(false);
 const intiForm = {
@@ -136,17 +133,6 @@ const getData = (params) => {
 onMounted(()=> {
     getData()
 })
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-}
-const handleCurrentChange = (val) => {
-    // console.log(`当前页: ${val}`);
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-}
 
 const formRef = ref({});
 const closeInfo = (formRef) => {

@@ -2,7 +2,7 @@
     <div class="homeworkList">
         <el-form :inline="true" :model="formInline" class="demo-form-inline" size="small">
             <el-form-item label="作业">
-                <el-input v-model="formInline.title" placeholder="请输入作业查询"></el-input>
+                <el-input v-model="formInline.searchName" placeholder="请输入作业查询"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="findHomeword">查询</el-button>
@@ -26,22 +26,19 @@
                 </template>
             </el-table-column> -->
         </el-table>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
-            :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-        </el-pagination>
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
     </div>
 </template>
 <script setup>
 
 import { getHomeWorkList } from '@/api/students/workList.js'
 import { reactive,ref, onMounted } from 'vue';
+import Pageing from '../common/Pageing.vue'
 const tableData = ref([]);
 const pageStart = ref(1);
-const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
-    title: ''
+    searchName: ''
 });
 const loading = ref(true);
 const getData = (params) => {
@@ -63,22 +60,12 @@ onMounted(() => {
     getData();
     loading.value = false;
 })
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title});
-}
-const handleCurrentChange = (val) => {
-    // console.log(`当前页: ${val}`);
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value,title:formInline.title });
-}
+
 const findHomeword = () => {
     getData(formInline);
 }
 const resetCondition = () => {
-    formInline.title = '';
+    formInline.searchName = '';
     getData(formInline);
 }
 const completedText = (row, cloumn) => {

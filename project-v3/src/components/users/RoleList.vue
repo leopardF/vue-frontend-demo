@@ -15,10 +15,11 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
+        <!-- <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageStart"
             :page-sizes="[5, 10, 20, 30]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
             :total="total">
-        </el-pagination>
+        </el-pagination> -->
+        <Pageing :pageStart="pageStart" :total="total" :formInline="formInline" @getData="getData"/>
         <el-dialog :title="state ? '添加角色信息' : '修改角色信息'" v-model="dialogFormVisible" width="500px">
             <el-form :model="form" :rules="rules" ref="formRef">
                 <el-form-item label="角色名" :label-width="formLabelWidth" prop="roleName">
@@ -37,25 +38,18 @@
 </template>
 
 <script setup>
-import {
-  Check,
-  Delete,
-  Edit,
-  Message,
-  Search,
-  Star,
-} from '@element-plus/icons-vue';
+import { Check, Delete, Edit, Message, Search, Star, } from '@element-plus/icons-vue';
 import { getRoleList, getMenusListByTree,removeRoleInfo,getRoleMenusList,addRoleInfo,updateRoleInfo } from '@/api/users/rolePermission.js';
 import {ElMessage,ElMessageBox} from "element-plus";
 import { onMounted, reactive, ref } from 'vue';
 import RolePermission from './RolePermission.vue';
+import Pageing from '../common/Pageing.vue'
 
 const tableData = ref([]);
 const pageStart = ref(1);
-const pageSize = ref(10);
 const total = ref(0);
 const formInline = reactive({
-    roleName: ''
+    searchName: ''
 });
 const dialogFormVisible = ref(false);
 const initForm = {
@@ -70,6 +64,8 @@ const state = ref(true);
 const loading = ref(true);
 
 const getData = (params) => {
+    console.log("触发1", params);
+    console.log("触发1-1", params?.pageSize);
     loading.value = true;
     getRoleList(params)
         .then(res => {
@@ -108,17 +104,17 @@ onMounted(()=>{
     loading.value = false;
     
 })
-const handleSizeChange = (val) => {
-    // console.log(`每页 ${val} 条`);
-    pageSize.value = val;
-    pageStart.value = 1;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-}
-const handleCurrentChange = (val) => {
-    // console.log(`当前页: ${val}`);
-    pageStart.value = val;
-    getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
-}
+// const handleSizeChange = (val) => {
+//     // console.log(`每页 ${val} 条`);
+//     pageSize.value = val;
+//     pageStart.value = 1;
+//     getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+// }
+// const handleCurrentChange = (val) => {
+//     // console.log(`当前页: ${val}`);
+//     pageStart.value = val;
+//     getData({ pageSize: pageSize.value, pageStart: pageStart.value, name: formInline.name });
+// }
 
 const formRef = ref({});
 const closeInfo = (formRef) => {
