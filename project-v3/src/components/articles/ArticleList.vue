@@ -100,13 +100,13 @@ const removeData = (row) => {
 const addArticleInfo = () => {
     state.value = true;
     Object.assign(form, initForm);
-    router.push({path:"/home/articleDetail", query: { state: state.value } });
+    router.push({path:"/article/articleDetail", query: { state: state.value } });
 }
 
 const editData = (row) => {
     state.value = false;
-    console.log("state" , state.value)
-    router.push({path:"/home/articleDetail", query: { articleInfoId: row.id , state: state.value } })
+    // console.log("state" , state.value)
+    router.push({path:"/article/articleDetail", query: { articleInfoId: row.id , state: state.value } })
 }
 const disableText = (row, cloumn) => {
     return row.isDisable ? '禁用' : '启用';

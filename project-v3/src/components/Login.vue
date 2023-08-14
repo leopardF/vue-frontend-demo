@@ -6,7 +6,7 @@
                     <span>通用后台管理系统</span>
                 </div>
             </template>
-            <el-form label-width="80px" :model="form" ref="formRef" :rules="rules">
+            <el-form label-width="80px" :model="form" ref="form" :rules="rules">
                 <el-form-item label="用户名" prop="username">
                     <el-input v-model="form.username" id="username"></el-input>
                 </el-form-item>
@@ -14,51 +14,57 @@
                     <el-input type="password" v-model="form.password" id="password"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="loginFun(formRef)">登录</el-button>
+                    <el-button type="primary" @click="login('form')">登录</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
     </div>
 </template>
 
-<script setup>
-
+<script>
 import { loginNameRule,passRule} from '../utils/vaildate.js'
 import { setToken} from '@/utils/setToken.js'
 import {loginSum} from '@/api/login.js'
-import {ElMessage} from "element-plus";
-import { useRouter,useRoute } from 'vue-router'
-const router = useRouter();
-const route = useRoute();
-const form = {
-    username: '',
-    password: ''
-};
-const rules ={
-    username:[{validator:loginNameRule,trigger:'blur'}],
-    password:[{validator:passRule,trigger:'blur'}]
-}
+import store from '@/store'
+export default {
+    data() {
 
-const loginFun = (formRef) =>{
-    formRef.validate((valid)=>{
-        if(valid){
+        return {
+            form: {
+                username: '',
+                password: ''
+            },
+            rules:{
+                username:[{validator:loginNameRule,trigger:'blur'}],
+                password:[{validator:passRule,trigger:'blur'}]
+            }
+        }
+    },
+    methods:{
+        login(form){
             
-            loginSum(form).then(res => {
-                if(res.data.code === 200){
-                    // localStorage.setItem('username',res.data.username)
-                    setToken("username" ,res.data.data.username )
-                    setToken("token" ,res.data.data.token )
-                    ElMessage({message: res.data.message, type:'success'})
-                    router.push(route.query.redirect || '/home')
+        console.log("store.state.permit.all_router -3 " , store.state.permit.all_router)
+            this.$refs[form].validate((valid)=>{
+                if(valid){
+                    console.log(this.form);
+                    loginSum(this.form).then(res => {
+                        if(res.data.code === 200){
+                            // localStorage.setItem('username',res.data.username)
+                            setToken("username" ,res.data.data.username )
+                            setToken("token" ,res.data.data.token )
+                            this.$message({message: res.data.message, type:'success'})
+                            this.$router.push(this.$route.query.redirect || '/admin')
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+                } else {
+                    console.error(this.form);
                 }
             })
-            .catch(err => {
-                console.log(err);
-            })
-        } else {
-            ElMessage({ message: '表单数据验证失败', type: 'error' });
         }
-    })
+    }
 }
 </script>
 

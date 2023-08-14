@@ -4,24 +4,32 @@
             <div class="title">通用后台管理系统</div>
             <div>
                 <i class="fa fa-user"></i>{{ name }}
-                <i class="fa fa-sign-out" style="margin-right:0 5px"></i>
+                <a class="fa fa-sign-out" style="margin-right:0 5px" @click="logout"></a>
             </div>
         </el-header>
     </div>
 
 </template>
 
-<script>
-import {getToken} from '@/utils/setToken.js'
-export default{
-    data(){
-        return{
-            name:''
-        }
-    },
-    created() {
-        this.name = getToken('username')
-    }
+<script setup>
+import {getToken, removeToken} from '@/utils/setToken.js'
+import { useRouter } from 'vue-router'
+import store from '@/store'
+const router = useRouter();
+const name = getToken('username');
+const logout = () => {
+    //正常要清除后端token数据，此处简易跳过
+    removeToken("token")
+    removeToken("username")
+        router.replace({path:"/"});
+        window.location.reload();
+    // store.dispatch("permit/actionRemovePermission")
+    // .then(() => {
+    //     router.replace({path:"/"});
+    // })
+    // .catch(err => {
+    //     console.log("err" , err)
+    // })
 }
 </script>
 <style lang="scss" scoped>

@@ -4,17 +4,10 @@
         <el-button type="primary"  @click="blackPage">返回上一页</el-button>
     </div>
 </template>
-<script>
-import { defineComponent , getCurrentInstance} from 'vue'
-export default defineComponent({
-    setup() {
-        const { proxy } = getCurrentInstance()
-        function blackPage(){
-            proxy.$router.go(-1);
-        }
-    },
-    return : {
-        blackPage
-    }
-})
+<script setup>
+import { getCurrentInstance} from 'vue'
+const { proxy } = getCurrentInstance()
+const blackPage = () => {
+    proxy.$router.go(-1);
+}
 </script>

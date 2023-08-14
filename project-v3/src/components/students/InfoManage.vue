@@ -134,7 +134,7 @@ onMounted(()=> {
     getData()
 })
 
-const formRef = ref({});
+const formRef = reactive({});
 const closeInfo = (formRef) => {
     dialogFormVisible.value = false;
     nextTick(() => {
