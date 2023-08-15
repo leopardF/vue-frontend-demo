@@ -3,8 +3,17 @@
         <el-header>
             <div class="title">通用后台管理系统</div>
             <div>
-                <i class="fa fa-user" @click="showDialog"></i>{{ name }}
-                <a class="fa fa-sign-out" style="margin-right:0 5px" @click="logout"></a>
+                <i class="fa fa-user-circle-o"></i>
+                <span v-popover="popoverRef" v-click-outside="onClickOutside">{{ name }}</span>
+                <el-popover
+                    ref="popoverRef"
+                    trigger="click"
+                    title="设置"
+                    virtual-triggering
+                    persistent>
+                    <a class="fa fa-unlock-alt" @click="showDialog"> 修改密码 </a>
+                </el-popover>
+                <a class="fa fa-sign-out" style="margin:0 10px" @click="logout"></a>
             </div>
         </el-header>
         <el-dialog :title="'修改密码'" v-model="dialogFormVisible" width="500px">
@@ -33,10 +42,10 @@
 <script setup>
 import {getToken, removeToken} from '@/utils/setToken.js'
 import { useRouter } from 'vue-router'
-import { ref,reactive } from 'vue';
+import { ref,reactive,unref } from 'vue';
 import { validateConfirmPassword,passRule} from '@/utils/vaildate.js'
 import { updateBackUserByPassword } from '@/api/users/backUserRole.js';
-import {ElMessage} from "element-plus";
+import {ElMessage,ClickOutside as vClickOutside} from "element-plus";
 const router = useRouter();
 const name = getToken('username');
 const dialogFormVisible = ref(false);
@@ -70,6 +79,13 @@ const logout = () => {
 const showDialog = () => {
     dialogFormVisible.value = !dialogFormVisible.value;
 }
+
+const popoverRef = ref()
+const onClickOutside = () => {
+  unref(popoverRef).popperRef?.delayHide?.()
+}
+
+
 const formRef = ref({});
 const onSumbit = (formRef) => {
     // console.log(form, this.form);
