@@ -30,6 +30,15 @@ const routes = [{
     component: () => import('@/components/Login')
 },
 {
+    path: '/home',
+    hidden: true,
+    name: 'Home',
+    meta: {
+        label: 'Home'
+    },
+    component: () => import('@/components/Home')
+},
+{
     name: 'NotFound',
     path: '/:catchAll(.*)',
     hidden: true,
@@ -66,14 +75,13 @@ router.beforeEach((to, from, next) => {
             next()
         }
     } else {
-        console.log("to - " , to)
-        console.log("store.state.permit.all_router -1 " , store.state.permit.all_router)
         if(store.state.permit.all_router.length === 0){
             store.dispatch("permit/actionGetPermission")
             .then(() => {
                 // 更新静态路由
                 const allRouter = store.state.permit.all_router
                 router.options.routes = allRouter
+                console.log("router.options.routes",router.options.routes)
                 //更新动态路由
                 const asyncRouter = store.state.permit.asynd_router
                 asyncRouter.forEach(item => {
@@ -98,10 +106,16 @@ router.beforeEach((to, from, next) => {
             if(to.name === 'Login'){
                 router.go(-1)
             }else {
+                console.log(to)
+                console.log("router.getRoutes()",router.getRoutes())
                 if(to.name === 'Admin' || to.path === '/' ){
                     const asyncRouter = store.state.permit.asynd_router
                     const first_router = asyncRouter[0]?.children[0] || asyncRouter[0]
-                    next({...first_router,replace: true})
+                    if(first_router === undefined){
+                        next({path: '/home'})
+                    }else {
+                        next({...first_router,replace: true})
+                    }
                 }else{
                     next()
                 }

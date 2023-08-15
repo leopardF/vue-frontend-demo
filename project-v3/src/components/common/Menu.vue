@@ -47,8 +47,9 @@ const filteredChildren = (children) => {
             }
         }
 
-        .el-submenu .el-menu-item {
-            min-width: 0;
+        .el-sub-menu{
+            margin-bottom: 6px;
+            box-shadow: 0 2px 3px #fff;
         }
 
     }

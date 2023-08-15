@@ -13,7 +13,7 @@ export function formatDate(cellValue) {
 
   export function packageMenus(data){
     let temp = [];
-    if (data, data.length > 0) {
+    if (data, data?.length > 0) {
       data.forEach(item => {
         const childrenTemp = [];
         if (item.childrenList && item.childrenList.length > 0) {

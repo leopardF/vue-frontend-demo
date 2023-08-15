@@ -3,10 +3,29 @@
         <el-header>
             <div class="title">通用后台管理系统</div>
             <div>
-                <i class="fa fa-user"></i>{{ name }}
+                <i class="fa fa-user" @click="showDialog"></i>{{ name }}
                 <a class="fa fa-sign-out" style="margin-right:0 5px" @click="logout"></a>
             </div>
         </el-header>
+        <el-dialog :title="'修改密码'" v-model="dialogFormVisible" width="500px">
+            <el-form :model="form" :rules="rules" ref="formRef">
+                <el-form-item label="原始密码" :label-width="formLabelWidth" prop="oldPassword">
+                    <el-input type="password" v-model="form.oldPassword" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" :label-width="formLabelWidth" prop="newPassword">
+                    <el-input type="password" v-model="form.newPassword" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码" :label-width="formLabelWidth" prop="confimPassword">
+                    <el-input type="password" v-model="form.confimPassword" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span  class="dialog-footer">
+                    <el-button @click="closeInfo(formRef)">取 消</el-button>
+                    <el-button type="primary" @click="onSumbit(formRef)">确 定</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 
 </template>
@@ -14,22 +33,62 @@
 <script setup>
 import {getToken, removeToken} from '@/utils/setToken.js'
 import { useRouter } from 'vue-router'
-import store from '@/store'
+import { ref,reactive } from 'vue';
+import { validateConfirmPassword,passRule} from '@/utils/vaildate.js'
+import { updateBackUserByPassword } from '@/api/users/backUserRole.js';
+import {ElMessage} from "element-plus";
 const router = useRouter();
 const name = getToken('username');
+const dialogFormVisible = ref(false);
+const formLabelWidth = '100px';
+const intiForm = {
+    oldPassword: '',
+    newPassword: '',
+    confimPassword: ''
+};
+const form = reactive({...intiForm});
+const rules = {
+    oldPassword: [{ required: true, message: '请输入原始密码' }],
+    newPassword: [
+        { required: true, message: '请输入新密码' },
+        { validator: passRule, trigger: 'blur' }
+    ],
+    confimPassword: [
+        { required: true, message: '请输入确认密码' },
+        { validator: (rule, value, callback) => validateConfirmPassword(rule, value, form.newPassword, callback), trigger: 'blur' }
+    ]
+}
+
 const logout = () => {
     //正常要清除后端token数据，此处简易跳过
     removeToken("token")
     removeToken("username")
-        router.replace({path:"/"});
-        window.location.reload();
-    // store.dispatch("permit/actionRemovePermission")
-    // .then(() => {
-    //     router.replace({path:"/"});
-    // })
-    // .catch(err => {
-    //     console.log("err" , err)
-    // })
+    router.replace({path:"/"});
+    window.location.reload();
+}
+
+const showDialog = () => {
+    dialogFormVisible.value = !dialogFormVisible.value;
+}
+const formRef = ref({});
+const onSumbit = (formRef) => {
+    // console.log(form, this.form);
+    formRef.validate(vaild => {
+        if (vaild) {
+            updateBackUserByPassword(form).then(res => {
+                if (res.data.code === 200) {
+                    ElMessage({ message: '编辑成功', type: 'success' })
+                    dialogFormVisible.value = false;
+                } else {
+                    ElMessage({ message: res.data.message, type: 'error' })
+                }
+            })
+            Object.assign(form, intiForm);
+        } else {
+            // 验证不通过，显示错误信息
+            ElMessage({ message: '表单数据验证失败', type: 'error' });
+        }
+    })
 }
 </script>
 <style lang="scss" scoped>

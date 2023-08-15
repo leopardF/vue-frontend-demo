@@ -43,10 +43,9 @@ export default {
     methods:{
         login(form){
             
-        console.log("store.state.permit.all_router -3 " , store.state.permit.all_router)
             this.$refs[form].validate((valid)=>{
                 if(valid){
-                    console.log(this.form);
+                    // console.log(this.form);
                     loginSum(this.form).then(res => {
                         if(res.data.code === 200){
                             // localStorage.setItem('username',res.data.username)

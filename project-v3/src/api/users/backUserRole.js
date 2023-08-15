@@ -61,3 +61,12 @@ export function addBackUserInfo(data){
         data:data
     })
 }
+
+//修改用户密码接口
+export function updateBackUserByPassword(data){
+    return service({
+        method:'post',
+        url:'/v1/user/updateBackUserByPassword',
+        data:data
+    })
+}
